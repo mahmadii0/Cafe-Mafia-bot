@@ -162,7 +162,7 @@ def blindFunc(bot, ChatId):
     bot.send_message(ChatId, """به همگی دوستان داخل بازی خوش آمد میگم😎
     از اینکه قراره یک بازی لذت بخش با شما رو داشته باشم خشنودم🪶
     دوستان نقش ها داخل پیوی شما توسط من اعلام شده و اکنون روز بلایند(ناآگاهی یا کوری) رو تا 5 ثانیه دیگه شروع می کنیم. اگر صحبت شما تمام شد با نوشتن کلمه اتمام کلام من رو آگاه کنید""")
-    # Chat(bot,ChatId)
+    Chat(bot,ChatId)
     bot.send_message(ChatId,'شب آغاز شد... شهر به خواب بره...🌙')
     global challenge
     challenge=True
@@ -245,7 +245,7 @@ def Challenge(P, bot, chatId):
     markup = InlineKeyboardMarkup()
     add_btn = InlineKeyboardButton('من میخوام', callback_data='add_challenge')
     markup.add(add_btn)
-    bot.send_message(chatId, f'''کی از🟠 {player["name"]} چالش میخواد؟''', reply_markup=markup)
+    bot.send_message(chatId, f'''کی از {player["name"]} 🟠چالش میخواد؟''', reply_markup=markup)
     Wait(5)
 
 
