@@ -5,7 +5,8 @@ from requests import delete
 from telebot.apihelper import delete_message, send_message
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from constants import PlayerList, Rolelist, BotUserIds
-import asyncio
+import threading
+
 
 
 playerNames = []
@@ -29,8 +30,9 @@ challenge= False
 challengeOn=False
 blindNight=False
 deleteVoteMessage=False
+lock = threading.Lock()
 NumOfVote=0
-Voter={}
+Voter=set()
 defence=[]
 
 inqueryRequest=2
@@ -162,7 +164,7 @@ def blindFunc(bot, ChatId):
     bot.send_message(ChatId, """به همگی دوستان داخل بازی خوش آمد میگم😎
     از اینکه قراره یک بازی لذت بخش با شما رو داشته باشم خشنودم🪶
     دوستان نقش ها داخل پیوی شما توسط من اعلام شده و اکنون روز بلایند(ناآگاهی یا کوری) رو تا 5 ثانیه دیگه شروع می کنیم. اگر صحبت شما تمام شد با نوشتن کلمه اتمام کلام من رو آگاه کنید""")
-    Chat(bot,ChatId)
+    #Chat(bot,ChatId)
     bot.send_message(ChatId,'شب آغاز شد... شهر به خواب بره...🌙')
     global challenge
     challenge=True
@@ -368,28 +370,30 @@ def Voting(bot,chatId):
 def CountingVote(bot,call,P):
     global NumOfVote
     global Voter
-    # if call.from_user.id not in Voter:
-    Voter.add(call.from_user.id)
-    NumOfVote+=1
-    if NumOfVote==11 :
-        TrueNum=NumOfVote-10
-        NumOfVote=TrueNum
-    playerUser = call.from_user.username
-    playerName = call.from_user.first_name
-    bot.answer_callback_query(callback_query_id=call.id
-                                   , text='رای شما برای ایشان ثبت شد'
-                                   , show_alert=True)
-
-    PlayerLink = f'<a href="https://t.me/{playerUser}">{playerName}</a>'
-    Links.append(PlayerLink)
-    text = f'''\n {P["name"]}رای گیری می کنیم برای  
-    لیست رای دهندگان:
-    {Links}'''
-    markup = InlineKeyboardMarkup()
-    voteBtn = InlineKeyboardButton('رای میدم', callback_data=f'vote_{P["id"]}')
-    markup.add(voteBtn)
-    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text,
+    if call.from_user.id not in Voter:
+        Voter.add(call.from_user.id)
+        with lock:
+            NumOfVote += 1
+        playerUser = call.from_user.username
+        playerName = call.from_user.first_name
+        PlayerLink = f'<a href="https://t.me/{playerUser}">{playerName}</a>'
+        Links.append(PlayerLink)
+        text = f'''\n {P["name"]}رای گیری می کنیم برای  
+        لیست رای دهندگان:
+        {Links}'''
+        markup = InlineKeyboardMarkup()
+        voteBtn = InlineKeyboardButton('رای میدم', callback_data=f'vote_{P["id"]}')
+        markup.add(voteBtn)
+        bot.answer_callback_query(callback_query_id=call.id
+                                  , text='رای شما برای ایشان ثبت شد'
+                                  , show_alert=True)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text,
                               reply_markup=markup, parse_mode='HTML')
+    else:
+        bot.answer_callback_query(callback_query_id=call.id
+                                  , text='شما قبلا یکبار رای داده اید!'
+                                  , show_alert=True)
+
 
 def Defence(bot,chatId,HalfNumRole):
     Links.clear()
@@ -829,7 +833,7 @@ def Day(bot,chatId):
         bot.send_message(chatId, f'🔥🔥🔥شهر یعنی شماهااا! شهر پیروز شددد')
     DastbandList.clear()
     InquiryRequest(bot,chatId)
-    Chat(bot,chatId)
+    #Chat(bot,chatId)
     Voting(bot,chatId)
     Night(bot, chatId)
 

@@ -181,9 +181,6 @@ def register_handlers(bot):
                                               , show_alert=True)
             elif call.data == f'red_{Player["id"]}':
                 if str(call.from_user.id) == Player['id']:
-                # pList = [player for player in defence if player['id'] == str(call.from_user.id)]
-                # p = pList[0]
-                # if call.from_user.id == int(p['id']):
                     Delete_message(bot, call)
                     redCart(bot, call)
                 else:
