@@ -30,7 +30,7 @@ challengeOn=False
 blindNight=False
 deleteVoteMessage=False
 NumOfVote=0
-Voter=[]
+Voter={}
 defence=[]
 
 inqueryRequest=2
@@ -215,7 +215,7 @@ def InquiryRequest(bot,chatId):
 def VerifyInquiryRequest(bot,call):
     global Voter
     if call.from_user.id not in Voter:
-        Voter.append(call.from_user.id)
+        Voter.add(call.from_user.id)
         print(Voter)
         playerUser = call.from_user.username
         playerName = call.from_user.first_name
@@ -353,7 +353,7 @@ def Voting(bot,chatId):
         voteBtn= InlineKeyboardButton('رای میدم',callback_data=f'vote_{P["id"]}')
         markup.add(voteBtn)
         message=bot.send_message(chatId,f'{P["name"]}رای گیری می کنیم برای',reply_markup=markup)
-        Wait(3)
+        Wait(10)
         bot.delete_message(chatId,message.message_id)
         if NumOfVote>=HalfNumRole:
             player={'name': P['name'], 'id': P['id']
@@ -369,7 +369,7 @@ def CountingVote(bot,call,P):
     global NumOfVote
     global Voter
     # if call.from_user.id not in Voter:
-    Voter.append(call.from_user.id)
+    Voter.add(call.from_user.id)
     NumOfVote+=1
     if NumOfVote==11 :
         TrueNum=NumOfVote-10
