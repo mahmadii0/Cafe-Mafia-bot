@@ -238,7 +238,6 @@ def VerifyInquiryRequest(bot,call):
                                         , text='شما نمی توانید مجددا درخواست دهید'
                                         , show_alert=True)
 
-
 def Challenge(P, bot, chatId):
     global playerChallenger
     playerChallenger.append(P)
