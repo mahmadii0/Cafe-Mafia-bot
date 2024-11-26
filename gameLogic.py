@@ -1,14 +1,12 @@
 import random
 import time
 import telebot
-from requests import delete
 from telebot.apihelper import delete_message, send_message
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from constants import PlayerList, Rolelist, BotUserIds
 import threading
 
-
-
+instance=set()
 playerNames = []
 PlayerIds = []
 chatId = ''
@@ -104,22 +102,23 @@ def AddPlayer(bot,call):
 
 
 def FinalStart(bot,call):
-        UserId=call.from_user.id
-        ChatId=call.message.chat.id
-        ChatMember=bot.get_chat_member(chat_id=ChatId,user_id=UserId)
-        if ChatMember.status in ['administrator', 'creator']:
-            if len(PlayerList) == 11:
-                bot.answer_callback_query(callback_query_id=call.id
-                                          , text='بازی شروع شد!'
-                                          , show_alert=True)
-                bot.delete_message(ChatId,call.message.message_id)
-                Operations(bot,PlayerList,ChatId)
-            else:
-                bot.answer_callback_query(callback_query_id=call.id
-                                          ,text='تعداد به حد نصاب نرسیده است!'
-                                          ,show_alert=True)
+
+    UserId=call.from_user.id
+    ChatId=call.message.chat.id
+    ChatMember=bot.get_chat_member(chat_id=ChatId,user_id=UserId)
+    if ChatMember.status in ['administrator', 'creator']:
+        if len(PlayerList) == 11:
+            bot.answer_callback_query(callback_query_id=call.id
+                                        , text='بازی شروع شد!'
+                                        , show_alert=True)
+            bot.delete_message(ChatId,call.message.message_id)
+            Operations(bot,PlayerList,ChatId)
         else:
             bot.answer_callback_query(callback_query_id=call.id
+                                          ,text='تعداد به حد نصاب نرسیده است!'
+                                          ,show_alert=True)
+    else:
+        bot.answer_callback_query(callback_query_id=call.id
                                       , text='شما مجوز شروع بازی را ندارید!',
                                       show_alert=True)
 

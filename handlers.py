@@ -31,7 +31,19 @@ def register_handlers(bot):
 
     @bot.message_handler(regexp='شروع مافیا')
     def start_game_handler(message):
-        startG(bot, message)
+        global instance
+        if message.chat.type != "private":
+            def Instance():
+                with lock:
+                    newId = random.randint(10 ** 11, 10 ** 12 - 1)
+                    if newId not in instance:
+                        instance.add(newId)
+                    else:
+                        return instance()
+            Instance()
+            startG(bot, message)
+        else:
+            bot.send_message(message.chat.id,"شما باید از این دستور برای شروع بازی در گروه استفاده کنید")
 
 
     @bot.message_handler(regexp='اتمام کلام')
