@@ -3,9 +3,11 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 import gameLogic
 from constants import BotUserIds, PlayerList
+from dbMig import getGameId
 from gameLogic import *
 
 callList=[]
+
 
 def Delete_message(bot,call):
     bot.delete_message(call.message.chat.id, call.message.message_id)
@@ -35,13 +37,16 @@ def register_handlers(bot):
         if message.chat.type != "private":
             def Instance():
                 with lock:
+                    global gameId
                     newId = random.randint(10 ** 11, 10 ** 12 - 1)
                     if newId not in instance:
                         instance.add(newId)
+                        gameId = newId
                     else:
                         return instance()
             Instance()
-            startG(bot, message)
+            print(gameId)
+            startG(bot, message,gameId)
         else:
             bot.send_message(message.chat.id,"شما باید از این دستور برای شروع بازی در گروه استفاده کنید")
 
@@ -53,7 +58,9 @@ def register_handlers(bot):
     @bot.callback_query_handler(func=lambda call: True)
     def handle_callback(call):
         if call.data == "Add":
-            AddPlayer(bot, call)
+            chatId=call.message.chat.id
+            gameId=getGameId(chatId)
+            AddPlayer(bot, call,gameId,chatId)
         elif call.data == "FinalStart":
             FinalStart(bot, call)
         elif call.data == "add_challenge":
@@ -87,7 +94,7 @@ def register_handlers(bot):
             bot.send_message(call.from_user.id,'اوکی ماتادور از این پس بگذریم')
         elif call.data == "yes_sual":
             Delete_message(bot, call)
-            bot.send_message(chatId,' جالب مافیا درحال خریداری است... تازه بازی جذاب داره میشه')
+            # bot.send_message(chatId,' جالب مافیا درحال خریداری است... تازه بازی جذاب داره میشه')
             Sual(bot,call)
         elif call.data == "no_sual":
             gameLogic.pick = True

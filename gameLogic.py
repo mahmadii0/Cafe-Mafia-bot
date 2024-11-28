@@ -5,9 +5,12 @@ from telebot.apihelper import delete_message, send_message
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from constants import PlayerList, Rolelist, BotUserIds
 import threading
+import dbMig
+from dbMig import addInfo, createDb, lenTables, insertPL, addLink, fetchLinks
+
 
 instance=set()
-playerNames = []
+# NumOfDb=0
 PlayerIds = []
 chatId = ''
 PRoleList = []
@@ -45,9 +48,13 @@ DoctorSelfSave= False
 KeinMeeting=[]
 ConstantineBirth=False
 LeonBullet=2
-def startG(bot,message):
-    global chatId
-    chatId = message.chat.id
+
+def startG(bot,message,gameId):
+    addInfo(str(message.chat.id),gameId)
+    # with lock:
+    #     global NumOfDb
+    #     NumOfDb+=1
+    createDb(gameId)
     markup = telebot.types.InlineKeyboardMarkup()
     AddBtn = telebot.types.InlineKeyboardButton('من هستم✋', callback_data='Add')
     FinalStart = InlineKeyboardButton('شروع نهایی👁️‍🗨️', callback_data='FinalStart')
@@ -65,17 +72,19 @@ def startG(bot,message):
     """, reply_markup=markup)
 
 
-def AddPlayer(bot,call):
-    if len(PlayerList) < 11:
+def AddPlayer(bot,call,gameId,chatId):
+    lenT=lenTables(gameId,"playerList")
+    if len(lenT) < 11:
         if call.from_user.id in BotUserIds:
             playerId=str(call.from_user.id)
             playerUser = call.from_user.username
             PlayerName=call.from_user.first_name
             if playerUser not in PlayerList:
-                PlayerList.append({'name':PlayerName,'user':playerUser,'id':playerId},)
-            PlayerLink = f'<a href="https://t.me/{playerUser}">{PlayerName}</a>'
-            Links.append(PlayerLink)
-
+                player={'name':PlayerName,'id':playerId,'user':playerUser}
+                insertPL(gameId,'playerList',player)
+                playerLink = f'<a href="https://t.me/{playerUser}">{PlayerName}</a>'
+                addLink(gameId,playerLink)
+            links=fetchLinks(gameId)
             text = f"""به به چه دوستانی قراره دورهم مافیا بازی کنن!😎
             برای شرکت تو بازی، روی دکمه من هستم کلیک کنین تا این سناریو جذاب رو بازی کنیم!
             سناریو: پدرخوانده3
@@ -84,7 +93,7 @@ def AddPlayer(bot,call):
             نقش مستقل(شرلوک): 1
             *اگر بازی رو نمی دونید و آَشنایی ندارید از دستور /helpG استفاده کنید تا توضیح بدم.
             لیست بازیکنان:\n
-            {Links}
+            {links}
             """
 
             markup = InlineKeyboardMarkup()
@@ -102,12 +111,13 @@ def AddPlayer(bot,call):
 
 
 def FinalStart(bot,call):
-
     UserId=call.from_user.id
     ChatId=call.message.chat.id
     ChatMember=bot.get_chat_member(chat_id=ChatId,user_id=UserId)
     if ChatMember.status in ['administrator', 'creator']:
-        if len(PlayerList) == 11:
+        # lenT = lenTables(gameId, "playerList")
+        lenT=0
+        if len(lenT) == 11:
             bot.answer_callback_query(callback_query_id=call.id
                                         , text='بازی شروع شد!'
                                         , show_alert=True)
