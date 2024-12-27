@@ -1,6 +1,6 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from redis import *
 import gameLogic
 from constants import BotUserIds, PlayerList
 from dbMig import getGameId
@@ -9,8 +9,22 @@ from gameLogic import *
 callList=[]
 
 
+#delete messages that send to chats
 def Delete_message(bot,call):
     bot.delete_message(call.message.chat.id, call.message.message_id)
+
+#return gameId for all handlers
+def gId(call=None,chatId=None):
+    if call:
+        chatId = call.message.chat.id
+        gameId = getGameId(chatId)
+        return gameId
+    if chatId:
+        gameId=getGameId(chatId)
+        return gameId
+
+
+
 def register_handlers(bot):
     @bot.message_handler(commands=['start'])
     def start(message):
@@ -35,17 +49,17 @@ def register_handlers(bot):
     def start_game_handler(message):
         global instance
         if message.chat.type != "private":
+            gameId =0
             def Instance():
                 with lock:
-                    global gameId
-                    newId = random.randint(10 ** 11, 10 ** 12 - 1)
+                    newId = random.randint(10 ** 7, 10 ** 8 - 1)
                     if newId not in instance:
                         instance.add(newId)
-                        gameId = newId
+                        return newId
                     else:
                         return instance()
-            Instance()
-            print(gameId)
+            gameId=Instance()
+            deleteTables()
             startG(bot, message,gameId)
         else:
             bot.send_message(message.chat.id,"شما باید از این دستور برای شروع بازی در گروه استفاده کنید")
@@ -53,16 +67,19 @@ def register_handlers(bot):
 
     @bot.message_handler(regexp='اتمام کلام')
     def stopTalk_handler(message):
-        StopTalk(message)
+        gameId = gId(chatId=message.chat.id)
+        stopTalk(True,gameId)
+        startWait(gameId)
+        bot.send_message("@stop_talks",f"{gameId}")
 
     @bot.callback_query_handler(func=lambda call: True)
     def handle_callback(call):
         if call.data == "Add":
-            chatId=call.message.chat.id
-            gameId=getGameId(chatId)
-            AddPlayer(bot, call,gameId,chatId)
+            gameId=gId(call=call)
+            AddPlayer(bot, call,gameId)
         elif call.data == "FinalStart":
-            FinalStart(bot, call)
+            gameId=gId(call=call)
+            FinalStart(bot, call,gameId)
         elif call.data == "add_challenge":
             AddChallenge(bot,call)
         elif call.data == "yes_Sherlock":

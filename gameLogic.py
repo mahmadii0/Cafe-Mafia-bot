@@ -3,15 +3,16 @@ import time
 import telebot
 from telebot.apihelper import delete_message, send_message
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+import dbMig
 from constants import PlayerList, Rolelist, BotUserIds
 import threading
-import dbMig
-from dbMig import addInfo, createDb, lenTables, insertPL, addLink, fetchLinks
 
+from dbMig import *
 
 instance=set()
+chatEvents = {}
 # NumOfDb=0
-PlayerIds = []
 chatId = ''
 PRoleList = []
 SalakhiList=[]
@@ -25,7 +26,6 @@ ChallengeRequests=[]
 challenger=[]
 playerChallenger=[]
 Selector=[]
-stopTalk = False
 stopTask= False
 challenge= False
 challengeOn=False
@@ -50,11 +50,7 @@ ConstantineBirth=False
 LeonBullet=2
 
 def startG(bot,message,gameId):
-    addInfo(str(message.chat.id),gameId)
-    # with lock:
-    #     global NumOfDb
-    #     NumOfDb+=1
-    createDb(gameId)
+    addgame(gameId,message.chat.id)
     markup = telebot.types.InlineKeyboardMarkup()
     AddBtn = telebot.types.InlineKeyboardButton('من هستم✋', callback_data='Add')
     FinalStart = InlineKeyboardButton('شروع نهایی👁️‍🗨️', callback_data='FinalStart')
@@ -72,57 +68,65 @@ def startG(bot,message,gameId):
     """, reply_markup=markup)
 
 
-def AddPlayer(bot,call,gameId,chatId):
-    lenT=lenTables(gameId,"playerList")
-    if len(lenT) < 11:
-        if call.from_user.id in BotUserIds:
-            playerId=str(call.from_user.id)
-            playerUser = call.from_user.username
-            PlayerName=call.from_user.first_name
-            if playerUser not in PlayerList:
-                player={'name':PlayerName,'id':playerId,'user':playerUser}
-                insertPL(gameId,'playerList',player)
-                playerLink = f'<a href="https://t.me/{playerUser}">{PlayerName}</a>'
-                addLink(gameId,playerLink)
-            links=fetchLinks(gameId)
-            text = f"""به به چه دوستانی قراره دورهم مافیا بازی کنن!😎
-            برای شرکت تو بازی، روی دکمه من هستم کلیک کنین تا این سناریو جذاب رو بازی کنیم!
-            سناریو: پدرخوانده3
-            تعداد شهروندان(دکتر،لئون،کین،کنستانتین،ساده): 7
-            تعداد مافیا(پدرخوانده،ماتادور،ساول گودمن): 3
-            نقش مستقل(شرلوک): 1
-            *اگر بازی رو نمی دونید و آَشنایی ندارید از دستور /helpG استفاده کنید تا توضیح بدم.
-            لیست بازیکنان:\n
-            {links}
-            """
+def AddPlayer(bot,call,gameId):
+    with lock:
+        lenP = lenPlayers(gameId)
+    if int(lenP) < 11 :
+        if call.from_user.id in BotUserIds :
+            p=fetchWithPId(gameId,'players',call.from_user.id)
+            if not p:
+                playerId=str(call.from_user.id)
+                playerUser = call.from_user.username
+                playerName=call.from_user.first_name
+                playerLink = f'<a href="https://t.me/{playerUser}">{playerName}</a>'
+                player={'name':playerName,'id':playerId,'user':playerUser,'link':playerLink}
+                insertPL(gameId,'players',player)
+                links=fetchLinks(gameId)
+                text = f"""به به چه دوستانی قراره دورهم مافیا بازی کنن!😎
+                برای شرکت تو بازی، روی دکمه من هستم کلیک کنین تا این سناریو جذاب رو بازی کنیم   !
+                سناریو: پدرخوانده3
+                تعداد شهروندان(دکتر،لئون،کین،کنستانتین،ساده): 7
+                تعداد مافیا(پدرخوانده،ماتادور،ساول گودمن): 3
+                نقش مستقل(شرلوک): 1
+                *اگر بازی رو نمی دونید و آَشنایی ندارید از دستور /helpG استفاده کنید تا توضیح بدم.
+                لیست بازیکنان:\n
+                {links}
+                """
 
-            markup = InlineKeyboardMarkup()
-            AddBtn = telebot.types.InlineKeyboardButton('من هستم✋', callback_data='Add')
-            FinalStart = telebot.types.InlineKeyboardButton('شروع نهایی👁️‍🗨️', callback_data='FinalStart')
-            markup.add(AddBtn)
-            markup.add(FinalStart)
+                markup = InlineKeyboardMarkup()
+                AddBtn = telebot.types.InlineKeyboardButton('من هستم✋', callback_data='Add')
+                FinalStart = telebot.types.InlineKeyboardButton('شروع نهایی👁️‍🗨️', callback_data='FinalStart')
+                markup.add(AddBtn)
+                markup.add(FinalStart)
 
-            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text,
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text,
                                   reply_markup=markup, parse_mode='HTML')
+            else:
+                bot.answer_callback_query(callback_query_id=call.id
+                                          ,text='دوست عزیز شما در بازی هستید!منتظر شروع آن باشید'
+                                                , show_alert = True)
         else:
             bot.answer_callback_query(callback_query_id=call.id
                                         ,text='دوست عزیز شما ربات را استارت نکرده اید!'
                                         ,show_alert=True)
+    else:
+        bot.answer_callback_query(callback_query_id=call.id
+                                , text='شما دیگر نمی توانید اضافه شوید!'
+                                , show_alert=True)
 
-
-def FinalStart(bot,call):
+def FinalStart(bot,call,gameId):
     UserId=call.from_user.id
     ChatId=call.message.chat.id
     ChatMember=bot.get_chat_member(chat_id=ChatId,user_id=UserId)
     if ChatMember.status in ['administrator', 'creator']:
-        # lenT = lenTables(gameId, "playerList")
-        lenT=0
-        if len(lenT) == 11:
+        with lock:
+            lenP = lenPlayers(gameId)
+        if int(lenP) == 11:
             bot.answer_callback_query(callback_query_id=call.id
                                         , text='بازی شروع شد!'
                                         , show_alert=True)
             bot.delete_message(ChatId,call.message.message_id)
-            Operations(bot,PlayerList,ChatId)
+            Operations(bot,ChatId,gameId)
         else:
             bot.answer_callback_query(callback_query_id=call.id
                                           ,text='تعداد به حد نصاب نرسیده است!'
@@ -132,62 +136,81 @@ def FinalStart(bot,call):
                                       , text='شما مجوز شروع بازی را ندارید!',
                                       show_alert=True)
 
-def StopTalk(message):
-    global stopTalk
-    stopTalk = True
-
-
-def Operations(bot,PlayerList, ChatId):
-    chatId = ChatId
-    randomRole = random.sample(Rolelist, len(PlayerList))
-    for Player, Role in zip(PlayerList, randomRole):
-
-        PlayerRole = {'name': Player['name'], 'id': Player['id']
-            , 'user': Player['user'], 'side': '', 'role': Role}
-        if (PlayerRole['role'] == 'پدرخوانده'
-                or PlayerRole['role'] == 'ماتادور' or PlayerRole['role'] == 'ساول گودمن'):
-            PlayerRole['side'] = 'مافیا'
-        elif PlayerRole['role'] == 'شرلوک':
-            PlayerRole['side'] = 'شرلوک'
+def Operations(bot, chatId,gameId):
+    playerList=fetchall(gameId,'players')
+    randomRole = random.sample(Rolelist, len(playerList))
+    for player, role in zip(playerList, randomRole):
+        gamePlayer = { 'id': player[0],'name': player[1],
+                    'user': player[2],'link': player[3],
+                       'side': '', 'role': role , 'votes':0}
+        # gamePlayer = { 'id': player['id'],'name': player['name'],
+        #             'user': player['user'],'link': player['link'],
+        #                'side': '', 'role': role , 'votes':0}
+        if (gamePlayer['role'] == 'پدرخوانده'
+                or gamePlayer['role'] == 'ماتادور'
+                or gamePlayer['role'] == 'ساول گودمن'):
+            gamePlayer['side'] = 'مافیا'
+            insertMafia(player,gameId)
+        elif gamePlayer['role'] == 'شرلوک':
+            gamePlayer['side'] = 'شرلوک'
         else:
-            PlayerRole['side'] = 'شهروند'
+            gamePlayer['side'] = 'شهروند'
+        insertGP(gameId,'games_players',gamePlayer)
 
-        PRoleList.append(PlayerRole)
-    global mafias
-    mafias = [mafia for mafia in PRoleList if mafia['side'] == 'مافیا']
-    blindFunc(bot, chatId)
+    blindFunc(bot,chatId,gameId)
 
 
-def blindFunc(bot, ChatId):
-    Links.clear()
-    for P in PRoleList:
-        id = P['id']
-        PlayerIds.append(id)
+def blindFunc(bot, chatId,gameId):
+    pRoleList = fetchall(gameId, 'games_players')
     RestrictChatMember = telebot.types.ChatPermissions(can_send_messages=False)
-    for id in PlayerIds:
+    for P in pRoleList:
+        id = P[0]
         if id != "180477776":
-            bot.restrict_chat_member(ChatId, id, permissions=RestrictChatMember)
-    for P in PRoleList:
-        role = P['role']
-        bot.send_message(P['id'], f"""نقش شما دوست عزیز🗿: {role}""")
-    bot.send_message(ChatId, """به همگی دوستان داخل بازی خوش آمد میگم😎
+            bot.restrict_chat_member(chatId, id, permissions=RestrictChatMember)
+
+    for P in pRoleList:
+        role = P[4]
+        bot.send_message(P[0], f"""نقش شما دوست عزیز🗿: {role}""")
+    bot.send_message(chatId, """به همگی دوستان داخل بازی خوش آمد میگم😎
     از اینکه قراره یک بازی لذت بخش با شما رو داشته باشم خشنودم🪶
     دوستان نقش ها داخل پیوی شما توسط من اعلام شده و اکنون روز بلایند(ناآگاهی یا کوری) رو تا 5 ثانیه دیگه شروع می کنیم. اگر صحبت شما تمام شد با نوشتن کلمه اتمام کلام من رو آگاه کنید""")
-    #Chat(bot,ChatId)
-    bot.send_message(ChatId,'شب آغاز شد... شهر به خواب بره...🌙')
-    global challenge
-    challenge=True
-    Night(bot,ChatId)
+    Chat(bot,chatId,pRoleList,gameId)
+    bot.send_message(chatId,'شب آغاز شد... شهر به خواب بره...🌙')
+    trueChallenge(gameId)
+    Night(bot,chatId,gameId)
 
+chatLock = threading.Lock()
+def startWait(gameId):
+    with chatLock:
+        event = threading.Event()
+        chatEvents[str(gameId)] = event
 
-def Wait(seconds):
-    end_time = time.time() + seconds
-    while time.time() < end_time:
-        if stopTalk:
-            break
-        if stopTask:
-            break
-        time.sleep(0.1)
+def Wait(bot, seconds, gameId):
+    try:
+        endTime = time.time() + seconds
+        while time.time() < endTime:
+            # Check if the Event is set every second
+            if str(gameId) in chatEvents:
+                print(f"Timer stopped for chat {gameId}")
+                return
+            time.sleep(0.1)
+    finally:
+        with chatLock:
+            if str(gameId) in chatEvents:
+                del chatEvents[str(gameId)]
+
+# def Wait(bot,seconds,gameId):
+#     end_time = time.time() + seconds
+#     stop=False
+#     while time.time() < end_time:
+#         @bot.channel_post_handler(func=lambda message: message.chat.username == "stop_talks")
+#         def handler(message):
+#             if message.text ==str(gameId):
+#                 global stop
+#                 stop=True
+#         if stop:
+#             break
+#         time.sleep(0.1)
 
 def InquiryRequest(bot,chatId):
     global pick
@@ -322,37 +345,27 @@ def ApplyChallenge(bot, chatId):
     time.sleep(1.5)
 
 
-def Chat(bot,chatId):
-    global stopTalk
-    global challengeOn
-    startPlay = False
+def Chat(bot,chatId,pRoleList,gameId):
     time.sleep(5)
-    endTime = time.time() + 61
     RestrictChatMember = telebot.types.ChatPermissions(can_send_messages=False)
     AllowChatMember = telebot.types.ChatPermissions(can_send_messages=True)
-    for P in PRoleList:
+    for P in pRoleList:
+        if P[0] != "180477776":
+            bot.restrict_chat_member(chatId, P[0], permissions=AllowChatMember)
         if challenge:
             Challenge(P,bot,chatId)
-        if P['id'] != "180477776":
-            bot.restrict_chat_member(chatId, P['id'], permissions=AllowChatMember)
-        if startPlay == False:
-            bot.send_message(chatId, f'خب شروع می کنیم از {P["name"]} بفرمایید صحبت کنید: ')
-            startPlay = True
-        else:
-            bot.send_message(chatId, f'دوست عزیز {P["name"]} بفرمایید صحبت کنید: ')
-        stopTalk = False
-        Wait(61)
-        if P['id'] != "180477776":
-            bot.restrict_chat_member(chatId, P['id'], permissions=RestrictChatMember)
+        bot.send_message(chatId, f'دوست عزیز {P[1]} بفرمایید صحبت کنید: ')
+        dbMig.stopTalk(False,gameId)
+        Wait(bot,61,gameId)
+        if P[0] != "180477776":
+            bot.restrict_chat_member(chatId, P[0], permissions=RestrictChatMember)
         bot.send_message(chatId, f'دوست عزیز زمان صحبت شما تمام شد!')
-        stopTalk = False
-        ChallengeRequests.clear()
-        playerChallenger.clear()
+        dbMig.stopTalk(False, gameId)
         time.sleep(2)
-        if challengeOn:
-            ApplyChallenge(bot,chatId)
-            challengeOn=False
-        challenger.clear()
+        # if challengeOn:
+        #     ApplyChallenge(bot,chatId)
+        #     challengeOn=False
+        # challenger.clear()
 
 def Voting(bot,chatId):
     global NumOfVote
@@ -550,7 +563,7 @@ def redCart(bot,call):
     stopTalk=True
 
 
-def mafiaChat(bot):
+def mafiaChat(bot,mafiaList):
     class ChatState:
         active = True
 
@@ -559,14 +572,13 @@ def mafiaChat(bot):
 
     # Notify start
     if blindNight==False:
-        for mafia in mafias:
-            otherMafia = [f"{member['name']} ({member['role']})" for member in mafias if member["id"] != mafia["id"]]
+        for mafia in mafiaList:
+            otherMafia = [f"{member['name']} ({member['role']})" for member in mafiaList if member["id"] != mafia["id"]]
             message = "\n\nاعضای دیگر مافیا:\n" + "\n".join(otherMafia)
             bot.send_message(mafia["id"], message)
     else:
         pass
 
-    # Instead of managing updates directly, use a message handler
     @bot.message_handler(func=lambda message: ChatState.active)
     def handle_mafia_messages(message):
         # Check if sender is mafia
@@ -588,61 +600,56 @@ def mafiaChat(bot):
                         f"پیام از {sender['name']}: {message.text}"
                     )
 
-    # Wait for chat duration
     time.sleep(CHAT_DURATION)
 
-    # Deactivate the handler by setting ChatState.active to False
     ChatState.active = False
 
-    # Send end notification
     for mafia in mafias:
             bot.send_message(int(mafia['id']), "🔴زمان چت مافیا به پایان رسید")
 
     return mafiaMessages
 
 
-def Night(bot,chatId):
+def Night(bot,chatId,gameId):
     global pick
     global Old_DeadList
     global Old_SalakhiList
-    global blindNight
-    Old_DeadList= DeadList.copy()
-    Old_SalakhiList= SalakhiList.copy()
     waitTime=10
-    if blindNight:
+    blindNight=fetchvalue(gameId,'games_info','blind_night')
+    blindNight=int(blindNight[0])
+    if blindNight==1:
         #sherlock
-        sherlock = [player for player in PRoleList if player['role'] == 'شرلوک']
+        sherlock = fetchPlayer(gameId,'games_players','شرلوک')
         bot.send_message(chatId, 'شرلوک بیدار شو بیا پیوی مون:)')
         if not sherlock:
-            Wait(5)
+            Wait(bot,5,gameId)
         else:
-            sherlock=sherlock[0]
             sherlockMarkup = InlineKeyboardMarkup()
             yesSherlockBtn= InlineKeyboardButton('آره', callback_data='yes_Sherlock')
             noSherlockBtn= InlineKeyboardButton('نه', callback_data='no_Sherlock')
             sherlockMarkup.add(yesSherlockBtn)
             sherlockMarkup.add(noSherlockBtn)
             message=bot.send_message(sherlock['id'],'شرلوک بیدار شو! آیا امشب میخوای کسی رو سلاخی کنی؟',reply_markup=sherlockMarkup)
-            Wait(15)
+            Wait(bot,15,gameId)
             if pick==False:
                 bot.delete_message(sherlock['id'],message.message_id)
 
             bot.send_message(sherlock['id'],'شرلوک بخواب راحت باش')
 
     #Mafia
-
-    godFather = [god for god in mafias if god['role'] == 'پدرخوانده']
-    matador = [matador for matador in mafias if matador['role'] == 'ماتادور']
-    sualGoodman = [sual for sual in mafias if sual['role'] == 'ساول گودمن']
-    simpleMafia=[simple for simple in mafias if simple['role'] == 'مافیا ساده']
+    mafiaList=fetchPlayer(gameId, 'games_players', side='مافیا')
+    godFather = [god for god in mafiaList if god['role'] == 'پدرخوانده']
+    matador = [matador for matador in mafiaList if matador['role'] == 'ماتادور']
+    sualGoodman = [sual for sual in mafiaList if sual['role'] == 'ساول گودمن']
+    simpleMafia=[simple for simple in mafiaList if simple['role'] == 'مافیا ساده']
     #////////////
 
     bot.send_message(chatId,'مافیا بیدار شه بیا پیوی بهت مسیج دادم')
-    for mafia in mafias:
+    for mafia in mafiaList:
         bot.send_message(mafia['id'],f'{mafia["role"]} بیدار شو! ده ثانیه زود هرپیامی میخوای بفرست تا یار هات بخونن')
-    mafiaChat(bot)
+    mafiaChat(bot,mafiaList)
 
-    if blindNight:
+    if blindNight==1:
         global night
         night=++1
         if not godFather:
@@ -656,7 +663,7 @@ def Night(bot,chatId):
             godFatherMarkup.add(salakhiBtn)
             godFatherMarkup.add(shelik)
             message=bot.send_message(godFather['id'],'پدرخوانده بازی سلاخی می کنی یا شلیک می کنی؟',reply_markup=godFatherMarkup)
-            Wait(waitTime)
+            Wait(bot,waitTime,gameId)
             if pick==False:
                 bot.delete_message(godFather['id'],message.message_id)
         if not matador:
@@ -672,7 +679,7 @@ def Night(bot,chatId):
                 matadorShelikMarkup.add(noMatadorShelik)
                 message=bot.send_message(matador['id'], 'ماتادور حالا که پدرخوانده نیست تو بگو شلیک می کنی یا نه؟؟',
                                  reply_markup=matadorShelikMarkup)
-                Wait(waitTime)
+                Wait(bot,waitTime,gameId)
                 if pick == False:
                     bot.delete_message(matador['id'], message.message_id)
             pick = False
@@ -682,10 +689,10 @@ def Night(bot,chatId):
             matadorMarkup.add(yesMatadorBtn)
             matadorMarkup.add(noMatadorBtn)
             message=bot.send_message(matador['id'], 'ماتادور، آیا دستبند می زنی؟', reply_markup=matadorMarkup)
-            Wait(waitTime)
+            Wait(bot,waitTime,gameId)
             if pick==False:
                 bot.delete_message(matador['id'],message.message_id)
-        if len(mafias)<3 and sualGoodman:
+        if len(mafiaList)<3 and sualGoodman:
             pick = False
             sualGoodman = sualGoodman[0]
             if not godFather and not matador:
@@ -696,7 +703,7 @@ def Night(bot,chatId):
                 sualShelikMarkup.add(noSualShelik)
                 message=bot.send_message(sualGoodman['id'], 'ساول حالا که پدرخوانده نیست تو بگو شلیک می کنی یا نه؟؟',
                                  reply_markup=sualShelikMarkup)
-                Wait(waitTime)
+                Wait(bot,waitTime,gameId)
                 if pick == False:
                     bot.delete_message(sualGoodman['id'], message.message_id)
             pick = False
@@ -706,7 +713,7 @@ def Night(bot,chatId):
             sualMarkup.add(yesSualBtn)
             sualMarkup.add(noSualBtn)
             message=bot.send_message(sualGoodman['id'], 'ساول گودمن، مافیای حیله گر، آیا مذاکره می کنی؟', reply_markup=sualMarkup)
-            Wait(waitTime)
+            Wait(bot,waitTime,gameId)
             if pick == False:
                 bot.delete_message(sualGoodman['id'], message.message_id)
         if simpleMafia and not godFather and not matador and not sualGoodman:
@@ -718,58 +725,57 @@ def Night(bot,chatId):
             simpleMafiaMarkup.add(yesSimpleBtn)
             simpleMafiaMarkup.add(noSimpleBtn)
             message=bot.send_message(simpleMafia['id'],'مافیا ساده آیا شلیک می کنی؟',reply_markup=simpleMafiaMarkup)
-            Wait(waitTime)
+            Wait(bot,waitTime,gameId)
             if pick == False:
                 bot.delete_message(simpleMafia['id'], message.message_id)
-        for mafia in mafias:
+        for mafia in mafiaList:
             bot.send_message(mafia['id'], f'مافیای جیگر آروم بخواب')
 
         #Shahrvandan
 
         #Doctor
-        doctor = [doctor for doctor in PRoleList if doctor['role'] == 'دکتر']
+        doctor = fetchPlayer(gameId,'games_players','دکتر')
         bot.send_message(chatId, 'دکتر بیاد پیوی مریض داریم!')
         if not doctor:
-            Wait(5)
+            Wait(bot,5,gameId)
         else:
             pick = False
-            doctor = doctor[0]
             doctorMarkup = InlineKeyboardMarkup()
             yesDoctorBtn= InlineKeyboardButton('بله', callback_data='yes_doctor')
             noDoctorBtn= InlineKeyboardButton('خیر', callback_data='no_doctor')
             doctorMarkup.add(yesDoctorBtn)
             doctorMarkup.add(noDoctorBtn)
             message=bot.send_message(doctor['id'],'دکتر شهر، آیا کسی رو می خوای نجات بدی؟',reply_markup=doctorMarkup)
-            Wait(15)
+            Wait(bot,15,gameId)
             if pick == False:
                 bot.delete_message(doctor['id'], message.message_id)
 
         #Leon
-        leon = [leon for leon in PRoleList if leon['role'] == 'لئون']
+        leon = fetchPlayer(gameId,'games_players','لئون')
         bot.send_message(chatId, 'لئون حرفه ای مون بیدارشو بیا ببینیم چیکار می کنی!')
         if not leon:
-            Wait(5)
+            Wait(bot,5,gameId)
         else:
             pick = False
-            leon = leon[0]
             leonMarkup = InlineKeyboardMarkup()
             yesleonBtn = InlineKeyboardButton('بله', callback_data='yes_leon')
             noleonBtn = InlineKeyboardButton('خیر', callback_data='no_leon')
             leonMarkup.add(yesleonBtn)
             leonMarkup.add(noleonBtn)
             message = bot.send_message(leon['id'], 'لئون، آیا کسی رو می خوای با تیر بزنی؟', reply_markup=leonMarkup)
-            Wait(15)
+            Wait(Wait(bot, 15, gameId))
+
             if pick == False:
                 bot.delete_message(leon['id'], message.message_id)
 
         #Kein
-        kein = [kein for kein in PRoleList if kein['role'] == 'شهروند کین']
+        kein = fetchPlayer(gameId,'games_players','شهروند کین')
         bot.send_message(chatId,'شهروند کین بیدارشو ببینیم استعلام میگیری یا نه!')
         if not kein:
-            Wait(6)
+            Wait(Wait(bot, 6, gameId))
+
         else:
             pick = False
-            kein = kein[0]
             if KeinMeeting != None:
                 keinMarkup = InlineKeyboardMarkup()
                 yesKeinBtn= InlineKeyboardButton('بله', callback_data='yes_kein')
@@ -777,20 +783,21 @@ def Night(bot,chatId):
                 keinMarkup.add(yesKeinBtn)
                 keinMarkup.add(noKeinBtn)
                 message=bot.send_message(kein['id'],'شهروند کین، آیا کسی رو می خوای استعلام بگیری؟',reply_markup=keinMarkup)
-                Wait(15)
+                Wait(Wait(bot, 15, gameId))
+
                 if pick == False:
                     bot.delete_message(kein['id'], message.message_id)
             else:
                 bot.send_message(Kein['id'],'خب تو هم که استعلامتو گرفتی دیگه نمیپرسم')
-                Wait(7)
+                Wait(Wait(bot, 7, gameId))
 
         #Constantine
-        constantine = [constantine for constantine in PRoleList if constantine['role'] == 'کنستانتین']
+        constantine = fetchPlayer(gameId,'games_players','کنستانتین')
         bot.send_message(chatId,'کنستانتین کسی رو میخوای بیاری تو؟پیویم بگو')
         if not constantine:
-            Wait(waitTime)
+            Wait(Wait(bot, waitTime, gameId))
+
         else:
-            constantine = constantine[0]
             if ConstantineBirth == False:
                 pick = False
                 constantineMarkup = InlineKeyboardMarkup()
@@ -799,12 +806,13 @@ def Night(bot,chatId):
                 constantineMarkup.add(yesConstantineBtn)
                 constantineMarkup.add(noConstantineBtn)
                 message=bot.send_message(constantine['id'],'کنستانتین، آیا کسی رو می خوای بیاری داخل ؟',reply_markup=constantineMarkup)
-                Wait(15)
+                Wait(Wait(bot, 15, gameId))
+
                 if pick == False:
                     bot.delete_message(constantine['id'], message.message_id)
             else:
                 bot.send_message(constantine['id'],'خب تو هم که کارتو کردی بگذریم...')
-                Wait(9)
+                Wait(Wait(bot, 9, gameId))
 
     else:
         blindNight=True
