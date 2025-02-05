@@ -114,9 +114,6 @@ def Operations(bot, chatId,gameId):
         gamePlayer = { 'id': player[0],'name': player[1],
                     'user': player[2],'link': player[3],
                        'side': '', 'role': role , 'votes':0}
-        # gamePlayer = { 'id': player['id'],'name': player['name'],
-        #             'user': player['user'],'link': player['link'],
-        #                'side': '', 'role': role , 'votes':0}
         if (gamePlayer['role'] == 'پدرخوانده'
                 or gamePlayer['role'] == 'ماتادور'
                 or gamePlayer['role'] == 'ساول گودمن'):
@@ -414,8 +411,6 @@ def TrustDecision(bot,chatId,gameId):
         Ending(bot, chatId, gameId)
 
 
-
-
 votingTime=12
 def Voting(bot,chatId,gameId):
     players=fetchPlayer(gameId,'games_players')
@@ -432,8 +427,6 @@ def Voting(bot,chatId,gameId):
             status=insertVote(gameId,'votes',P['id'],'city')
             if status:
                 bot.send_message(chatId,f'به دفاع میره {P['name']} خب پس ...')
-        # global playerIds
-        # playerIds.clear()
         clearVoters(gameId)
     resetVotes(gameId, 'games_players')
     Defence(bot,chatId,HalfNum,gameId)
