@@ -99,24 +99,7 @@ def trueFalse(gameId,tableName,columnName,operate):
         elif operate == 'false':
             query = f"UPDATE `{tableName}` SET `{columnName}` = 0 WHERE game_id = %s"
             cursor.execute(query, (int(gameId),))
-# def stopTalk(operate,gameId):
-#     with dbConnection() as cursor:
-#         #operate is boolean that if it is true, it means function want to change the value of stop_talk in table to true and vice versa
-#         if operate:
-#             query = f"UPDATE games_info SET stop_talk = 1 WHERE game_id = %s"
-#             cursor.execute(query, (int(gameId),))
-#         else:
-#             query = f"UPDATE games_info SET stop_talk = 0 WHERE game_id = %s"
-#             cursor.execute(query, (int(gameId),))
-# def pick(operate,gameId):
-#     with dbConnection() as cursor:
-#         #operate is boolean that if it is true, it means function want to change the value of stop_talk in table to true and vice versa
-#         if operate:
-#             query = f"UPDATE games_info SET pick = 1 WHERE game_id = %s"
-#             cursor.execute(query, (int(gameId),))
-#         else:
-#             query = f"UPDATE games_info SET pick = 0 WHERE game_id = %s"
-#             cursor.execute(query, (int(gameId),))
+
 def activeChllnge(gameId,requesterId):
     with dbConnection() as cursor:
         query = f"UPDATE challenges SET status = 1 WHERE game_id = %s AND requester_id = %s"
@@ -147,8 +130,6 @@ def insertPL(gameId, tableName, player):
         query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s)"
         for player in PlayerList:
             cursor.execute(query, (player['id'], player['name'], player['user'], player['link'], int(gameId)))
-        # query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s)"
-        # cursor.execute(query, (player['id'], player['name'], player['user'], player['link'], int(gameId)))
 
 def insertGP(gameId, tableName, player):
     with dbConnection() as cursor:
