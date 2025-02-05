@@ -14,7 +14,7 @@ lock = threading.Lock()
 gameIds=[]
 Voters=[]
 chatEvents = {}
-# playerIds = []
+
 
 #Allow and Restrict Chating
 allowChatMember = telebot.types.ChatPermissions(can_send_messages=True)
