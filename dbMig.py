@@ -1,5 +1,10 @@
+from idlelib.sidebar import LineNumbers
+
 import mysql.connector
 from contextlib import contextmanager
+
+from mysql.connector import custom_error_exception
+
 from constants import connectionDetail
 from constants import PlayerList
 @contextmanager
@@ -34,12 +39,20 @@ def dbConnection():
 
 def deleteTables():
     with dbConnection() as cursor:
-        tables=['players','games_players']
+        tables=['hand_cuffed','slaughtereds','deads','defences','challenge_turns','challenges','votes','mafias','games_players','players']
         for table in tables:
-            cursor.execute(f"DELETE FROM `{table}`")
+            try:
+                cursor.execute(f"DELETE FROM `{table}`")
+                print(f"Deleted all rows from `{table}`")  # Optional: for debugging
+            except Exception as e:
+                print(f"Error deleting from `{table}`: {e}")
 
+def endGame(gameId):
+    with dbConnection() as cursor:
+        query = f"UPDATE games_info SET status = 0 WHERE game_id = %s"
+        cursor.execute(query, (int(gameId),))
 
-def addgame(gameId,chatId):
+def addGame(gameId,chatId):
     with dbConnection() as cursor:
         cursor.execute(f'''SELECT * FROM games_info WHERE chat_id=%s AND status=1 ''',(str(chatId),))
         existGame=cursor.fetchall()
@@ -47,17 +60,24 @@ def addgame(gameId,chatId):
             cursor.execute(f'''UPDATE games_info SET status = 0
             WHERE game_id = "{existGame[0][0]}"
             ''')
-            return addgame(gameId,chatId)
+            return addGame(gameId,chatId)
         else:
             cursor.execute('''
             INSERT INTO games_info  
-            VALUES (%s, %s, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1)
+            VALUES (%s, %s, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1,' ')
             ''', (abs(int(gameId)), str(chatId),))
         print("Successfully game added")
-
-def lenPlayers(gameId):
+def date(gameId,operate):
     with dbConnection() as cursor:
-        query = f"SELECT COUNT(*) FROM players WHERE game_id= %s"
+        if operate== "days":
+            query=f"UPDATE games_info SET days = days + 1 WHERE game_id = %s"
+            cursor.execute(query, (int(gameId),))
+        elif operate== "nights":
+            query=f"UPDATE games_info SET nights = nights + 1 WHERE game_id = %s"
+            cursor.execute(query, (int(gameId),))
+def lenPlayers(gameId,tableNames):
+    with dbConnection() as cursor:
+        query = f"SELECT COUNT(*) FROM `{tableNames}` WHERE game_id= %s"
         cursor.execute(query,(int(gameId),))
         len = cursor.fetchone()[0]
         if len:
@@ -68,40 +88,60 @@ def lenPlayers(gameId):
 def getGameId(chatId):
     with dbConnection() as cursor:
         query = f"SELECT game_id FROM games_info WHERE chat_id = %s AND status = 1"
-        #ORDER BY ROWID DESC LIMIT 1
-        cursor.execute(query, (chatId,))
+        cursor.execute(query, (str(chatId),))
         result = cursor.fetchone()
-        print(type(result))
-        print(result)
         return result[0]
-def trueChallenge(gameId):
+def trueFalse(gameId,tableName,columnName,operate):
     with dbConnection() as cursor:
-        query = f"UPDATE games_info SET challenge = 1 WHERE game_id = %s"
+        if operate == 'true':
+            query = f"UPDATE `{tableName}` SET `{columnName}` = 1 WHERE game_id = %s"
+            cursor.execute(query, (int(gameId),))
+        elif operate == 'false':
+            query = f"UPDATE `{tableName}` SET `{columnName}` = 0 WHERE game_id = %s"
+            cursor.execute(query, (int(gameId),))
+# def stopTalk(operate,gameId):
+#     with dbConnection() as cursor:
+#         #operate is boolean that if it is true, it means function want to change the value of stop_talk in table to true and vice versa
+#         if operate:
+#             query = f"UPDATE games_info SET stop_talk = 1 WHERE game_id = %s"
+#             cursor.execute(query, (int(gameId),))
+#         else:
+#             query = f"UPDATE games_info SET stop_talk = 0 WHERE game_id = %s"
+#             cursor.execute(query, (int(gameId),))
+# def pick(operate,gameId):
+#     with dbConnection() as cursor:
+#         #operate is boolean that if it is true, it means function want to change the value of stop_talk in table to true and vice versa
+#         if operate:
+#             query = f"UPDATE games_info SET pick = 1 WHERE game_id = %s"
+#             cursor.execute(query, (int(gameId),))
+#         else:
+#             query = f"UPDATE games_info SET pick = 0 WHERE game_id = %s"
+#             cursor.execute(query, (int(gameId),))
+def activeChllnge(gameId,requesterId):
+    with dbConnection() as cursor:
+        query = f"UPDATE challenges SET status = 1 WHERE game_id = %s AND requester_id = %s"
+        cursor.execute(query, (int(gameId),requesterId))
+def inqueryR(gameId,value):
+    with dbConnection() as cursor:
+        query = f"UPDATE games_info SET inquery_request = %s WHERE game_id = %s"
+        cursor.execute(query, (int(value),int(gameId),))
+def resetVotes(gameId,tableName):
+    with dbConnection() as cursor:
+        query=f"UPDATE `{tableName}` SET votes = 0 WHERE game_id = %s"
         cursor.execute(query, (int(gameId),))
-def stopTalk(operate,gameId):
+def leonBullet(gameId):
     with dbConnection() as cursor:
-        #operate is boolean that if it is true, it means function want to change the value of stop_talk in table to true and vice versa
-        if operate:
-            query = f"UPDATE games_info SET stop_talk = 1 WHERE game_id = %s"
-            cursor.execute(query, (int(gameId),))
-        else:
-            query = f"UPDATE games_info SET stop_talk = 0 WHERE game_id = %s"
-            cursor.execute(query, (int(gameId),))
+        query=f"UPDATE games_info SET leon_bullet = leon_bullet-1 WHERE game_id = %s"
+        cursor.execute(query,(int(gameId),))
 
+def sualPurchese(gameId,playerId):
+    with dbConnection() as cursor:
+        query=f"UPDATE `games_players` SET side = %s WHERE game_id = %s AND player_id = %s"
+        cursor.execute(query, ('مافیا',int(gameId),str(playerId)),)
+        query = f"UPDATE `games_players` SET role = %s WHERE game_id = %s AND player_id = %s"
+        cursor.execute(query, ('مافیا ساده', int(gameId), str(playerId)), )
 #INSERT FUNCs
 
-# def insert(gameId,tableName,player):
-#     with dbConnection(f'{gameId[0]}.db') as cursor:
-#         query = f"INSERT INTO '{tableName}' VALUES (?,?,?,?,?)"
-#         cursor.execute(query, (player['name'],player['id'],player['user'],player['side'],player['role']))
-#
-# #WV means with Votes of player(because on some tables,we have a dictionary with number of votes)
-# def insertWV(gameId,tableName,player):
-#     with dbConnection(f'{gameId[0]}.db') as cursor:
-#         query = f"INSERT INTO '{tableName}' VALUES (?,?,?,?,?,?)"
-#         cursor.execute(query, (player['name'],player['id'],player['user'],player['side'],player['role'],player['Votes']))
-#
-#PL means for playerList table because this has different with another tables
 def insertPL(gameId, tableName, player):
     with dbConnection() as cursor:
         query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s)"
@@ -115,94 +155,208 @@ def insertGP(gameId, tableName, player):
         query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         cursor.execute(query, (player['id'], player['name'], player['user'],player['side'],player['role'], player['link'],player['votes'], int(gameId)))
 
-def insertMafia(gameId, player):
+def insertBinaryTable(gameId,tableName,playerId):
     with dbConnection() as cursor:
-        query= f"INSERT INTO mafias VALUES (%s, %s)"
-        cursor.execute(query, (player['id'], int(gameId)))
-
-
-# #FETCH FUNCs
-
-def fetchall(gameId,tableName):
+        query= f"INSERT INTO `{tableName}` VALUES (%s, %s)"
+        cursor.execute(query, (playerId,int(gameId)))
+def insertChllnge(gameId,challenge):
     with dbConnection() as cursor:
-        query = f"SELECT * FROM `{tableName}` WHERE game_id = %s "
-        cursor.execute(query,(int(gameId),))
-        list= cursor.fetchall()
-        print(type(list))
-        return list
+        query= f"INSERT INTO challenges (requester_id, challenger_id, status, game_id) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (challenge['requesterId'],challenge['challengerId'],0,int(gameId)))
+
+def insertVote(gameId,tableName,playerId,type,numOfVotes=None):
+    with dbConnection() as cursor:
+        if type == 'inquery' or type == 'city' or type == 'death_draw_selector' or type == 'death_draw_player':
+            exist=existence(gameId,tableName,'player_id',playerId)
+            if not exist:
+                query= f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, 0)"
+                cursor.execute(query, (playerId,type,int(gameId)))
+                return True
+            else:
+                return False
+        elif type == 'exit':
+            exist=existence(gameId,tableName,'player_id',playerId)
+            if exist:
+                query= f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s)"
+                cursor.execute(query, (playerId,type,int(gameId),numOfVotes))
+                return True
+            else:
+                return False
+        elif type == 'addVote':
+                query = f"UPDATE `{tableName}` SET votes = votes + 1 WHERE player_id= %s AND game_id = %s"
+                cursor.execute(query, (playerId,int(gameId),))
+
+def insertDeadMan(gameId,player,date):
+    with dbConnection() as cursor:
+        query= f"INSERT INTO deads VALUES (%s, %s, %s ,%s ,%s ,%s ,%s ,%s)"
+        cursor.execute(query, (player[0],player[1],player[2],player[3],player[4],player[5],date, int(gameId)))
+
+def insertSlaughtered(gameId,player,date):
+    with dbConnection() as cursor:
+        query=f"INSERT INTO `slaughtereds` VALUES (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(query, (player[0],player[1],player[3],player[4],int(date), int(gameId),))
+
+def insertShakingHands(gameId,playerId):
+    with dbConnection() as cursor:
+        query = f"UPDATE games_info SET shaking_hands = %s WHERE game_id = %s"
+        cursor.execute(query,(str(playerId),int(gameId),))
+#FETCH FUNCs
+
+def fetchall(gameId,tableName=None,challengerId=None,Query=None):
+    with dbConnection() as cursor:
+        if challengerId:
+            query = f"SELECT * FROM `{tableName}` WHERE game_id = %s AND challenger_id = %s"
+            cursor.execute(query, (int(gameId),challengerId))
+            list = cursor.fetchall()
+            return list
+        elif Query:
+            query=Query
+            cursor.execute(query,(int(gameId),))
+            list=cursor.fetchall()
+            return list
+        else:
+            query = f"SELECT * FROM `{tableName}` WHERE game_id = %s "
+            cursor.execute(query,(int(gameId),))
+            list= cursor.fetchall()
+            print(type(list))
+            return list
 def createDic(*args):
     list=[]
     for arg in args:
-        dict={'id':arg[0],'name':arg[1],'user':arg[2],'side':arg[3],
-              'role':arg[4],'link':arg[5],'votes':arg[6],'gameId':arg[7]}
-        list.append(dict)
+        for i in arg:
+            dict={'id':i[0],'name':i[1],'user':i[2],'side':i[3],
+                'role':i[4],'link':i[5],'votes':i[6],'gameId':i[7]}
+            list.append(dict)
     return list
-def fetchPlayer(gameId,tableName,role=None,side=None):
-    with dbConnection() as cursor:
-        if role is None and side is None:
+def fetchPlayer(gameId,tableName,role=None,side=None,Type=None,date=None):
+    with (dbConnection() as cursor):
+        if (role is None and side is None
+            and Type is None and date is None):
             query = f"SELECT * FROM `{tableName}` WHERE game_id = %s"
             cursor.execute(query,(int(gameId),))
-            list= cursor.fetchall()
-            return list
-        elif role is not None:
+            players= cursor.fetchall()
+            if tableName != 'mafias':
+                players=createDic(players)
+            return players
+        elif (role is not None and side is None
+            and Type is None and date is None):
             query = f"SELECT * FROM `{tableName}` WHERE game_id = %s AND role = %s"
             cursor.execute(query,(int(gameId),role))
             player= cursor.fetchone()
-            list=createDic(player)
-            return list[0]
-        elif side is not None:
+            player={'id':player[0],'name':player[1],'user':player[2],'side':player[3],
+                'role':player[4],'link':player[5],'votes':player[6],'gameId':player[7]}
+            return player
+        elif (role is None and side is not None
+            and Type is None and date is None):
             query = f"SELECT * FROM `{tableName}` WHERE game_id = %s AND side = %s"
             cursor.execute(query,(int(gameId),side))
             players= cursor.fetchall()
-            list=createDic(players)
-            return list
-        elif role and side:
+            players=createDic(players)
+            return players
+        elif (role is not None and side is not None
+            and Type is None and date is None):
             query = f"SELECT * FROM `{tableName}` WHERE game_id = %s AND role = %s AND side = %s"
             cursor.execute(query,(int(gameId),role,side))
             player= cursor.fetchone()
-            list=createDic(player)
-            return list[0]
+            players=createDic(player)
+            return players[0]
+        elif (role is None and side is None
+            and Type is not None and date is None):
+            query = f"SELECT * FROM `{tableName}` WHERE game_id = %s AND type = %s"
+            cursor.execute(query,(int(gameId),Type))
+            players= cursor.fetchall()
+            print(type(players))
+            return players
+        elif (role is None and side is None
+            and Type is None and date is not None):
+            query = f"SELECT * FROM `{tableName}` WHERE game_id = %s AND date_of_death = %s"
+            print(gameId)
+            print(date)
+            cursor.execute(query,(int(gameId),int(date),))
+            players= cursor.fetchall()
+            print(type(players))
+            return players
 
-def fetchvalue(gameId,tableName,columnName):
+def fetchvalue(gameId,tableName,columnName,playerId=None):
     with dbConnection() as cursor:
-        query = f"SELECT `{columnName}` FROM `{tableName}` WHERE game_id = %s"
-        cursor.execute(query,(int(gameId),))
-        value=cursor.fetchone()
-        return value
+        if not playerId:
+            query = f"SELECT `{columnName}` FROM `{tableName}` WHERE game_id = %s"
+            cursor.execute(query,(int(gameId),))
+            value=cursor.fetchone()
+            value=value[0]
+            return value
+        else:
+            query = f"SELECT `{columnName}` FROM `{tableName}` WHERE game_id = %s AND player_id= %s"
+            cursor.execute(query,(int(gameId),playerId))
+            value=cursor.fetchone()
+            value=value[0]
+            return value
+def fetchRow(gameId,tableName,columnName,value):
+    with dbConnection() as cursor:
+        query = f"SELECT * FROM `{tableName}` WHERE game_id = %s AND `{columnName}` = %s"
+        cursor.execute(query,(int(gameId),value))
+        row= cursor.fetchall()
+        return row
 def fetchWithPId(gameId,tableName,playerId):
     with dbConnection() as cursor:
-        query=f"SELECT * FROM `{tableName}` WHERE game_id= %s AND player_id= %s"
-        cursor.execute(query,(int(gameId),str(playerId),))
-        item= cursor.fetchone()
-        return item
-        # for item in list:
-        #     if playerId == item[1]:
-        #         return item
-        #     else:
-        #         pass
-
-
-def fetchLinks(gameId):
+        #I used this approach because changing gameId to a None object would require changing all its usages!
+        if gameId != 0:
+            query=f"SELECT * FROM `{tableName}` WHERE game_id= %s AND player_id= %s"
+            cursor.execute(query,(int(gameId),str(playerId),))
+            item= cursor.fetchone()
+            return item
+        else:
+            query=f"SELECT * FROM `{tableName}` WHERE player_id= %s"
+            cursor.execute(query,(str(playerId),))
+            item= cursor.fetchone()
+            return item
+def fetchWithFK(gameId,tableName,FK,FTableName,condition,value):
     with dbConnection() as cursor:
-        query = f"SELECT link FROM players WHERE game_id = %s"
-        cursor.execute(query,(int(gameId),))
-        links= cursor.fetchall()
-        return links
+        query=f"""SELECT {tableName}.{FK}
+        FROM `{tableName}`
+        JOIN `{FTableName}` ON {tableName}.{FK} = {FTableName}.{FK}
+        WHERE {FTableName}.{condition} = %s AND {FTableName}.game_id= %s"""
+        cursor.execute(query,(value,int(gameId),))
+        players=cursor.fetchall()
+        list=createDic(players)
+        return list
+
+#EXIST FUNC
+
+def existence(gameId,tableName,columnName,value):
+    with dbConnection() as cursor:
+        query= f"SELECT EXISTS (SELECT 1 FROM `{tableName}` WHERE game_id = %s AND `{columnName}` = %s)"
+        cursor.execute(query,(int(gameId),value))
+        result = cursor.fetchone()[0]
+        return result
+
+def fetchLinks(gameId,tableName,playerIds=None):
+    with dbConnection() as cursor:
+        if playerIds:
+            links=[]
+            for playerId in playerIds:
+                query = f"SELECT link FROM `{tableName}` WHERE player_id = %s AND game_id = %s"
+                cursor.execute(query,(playerId,int(gameId),))
+                link= cursor.fetchone()
+                links.append(link[0])
+            return links
+        else:
+            query = f"SELECT link FROM `{tableName}` WHERE game_id = %s"
+            cursor.execute(query,(int(gameId),))
+            links= cursor.fetchall()
+            return links
 
 # #Delete and Drop
 #
-# def clearTable(dbName,tableName):
-#     with dbConnection(f'{dbName}.db') as cursor:
-#         cursor.execute(f"DELETE FROM '{tableName}' ")
-#
-#
-#
-#
-#
-# # listTables()
-# def delete(dbName,tableName):
-#     with dbConnection(f'{dbName}.db') as cursor:
-#         cursor.execute(f"DELETE FROM '{tableName}' ")
+def deleteRows(tableName,columnName1,value1,columnName2=None,value2=None):
+    with dbConnection() as cursor:
+        if columnName2 and value2:
+            query=f"DELETE FROM `{tableName}` WHERE {columnName1} = %s AND `{columnName2}` = %s"
+            cursor.execute(query,(value1,value2,))
+        else:
+            query=f"DELETE FROM `{tableName}` WHERE {columnName1} = %s"
+            cursor.execute(query,(value1,))
+
 
 
 
