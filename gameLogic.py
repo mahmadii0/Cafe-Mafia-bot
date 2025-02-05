@@ -1,11 +1,8 @@
 import random
 import time
 import telebot
-from redis.commands.search.query import Query
-from telebot.apihelper import delete_message, send_message
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-import dbMig
-from constants import PlayerList, Rolelist, BotUserIds
+from constants import Rolelist, BotUserIds
 import threading
 from dbMig import *
 lock = threading.Lock()
