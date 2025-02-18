@@ -1,13 +1,5 @@
-import telebot
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from redis import *
-import gameLogic
-from constants import BotUserIds, PlayerList
-from dbMig import getGameId
 from gameLogic import *
-
-callList=[]
-
+from telebot.types import Message
 
 #delete messages that send to chats
 def Delete_message(bot,call):
@@ -30,47 +22,55 @@ def gId(call=None,chatId=None):
 
 
 
-def register_handlers(bot):
+def register_handlers(bot: telebot):
     @bot.message_handler(commands=['start'])
-    def start(message):
+    def start(message: Message):
         if message.chat.type == "private":
             userId = message.from_user.id
-            if userId not in BotUserIds:
-                BotUserIds.append(userId)
-            bot.send_message(
-                message.chat.id,
-                "سلام به ربات ما خوش آمدید.\nاکنون ارسال پیام و پاسخ برای شما باز شد"
-            )
+            exist=[user for user in BotUserIds if user['id'] == str(userId)]
+            if not exist:
+                bot.send_message(message.chat.id, 'لطفا یک نام برای فرآیند بازی مافیا ارسال کنید (این نام دائمی می‌ماند):')
+                bot.register_next_step_handler(message, nameInput, bot)
+            else:
+                bot.send_message(message.chat.id, 'شما مجوز بازی را دارید و نیازی به ثبت نام نیست !')
+
 
     @bot.message_handler(commands=['privacy'])
     def start(message):
         if message.chat.type == "private":
             bot.send_message(
                 message.chat.id,
-                "و البته اسم قشنگ تون!\nما تنها از آیدی شما برای تگ کردن ها برای  جریان بازی استفاده می کنیم!"
+                "We only use your ID for tagging for the game stream! \n And of course your beautiful name!"
             )
 
-    @bot.message_handler(regexp='شروع مافیا')
+    @bot.message_handler(regexp=r'شروع مافیا|start mafia')
     def start_game_handler(message):
         global instance
         if message.chat.type != "private":
+            langCode=''
+            if message.text == 'شروع مافیا':
+                langCode='fa'
+            else:
+                langCode='en'
             gameId =0
             def Instance():
                 with lock:
                     newId = random.randint(10 ** 7, 10 ** 8 - 1)
-                    if newId not in gameIds:
-                        gameIds.append(newId)
+                    exist = [game for game in gameIds if game['id'] == str(newId)]
+                    if not exist:
+                        game={'id':str(newId),'langCode':langCode}
+                        gameIds.append(game)
                         return newId
                     else:
                         return instance()
             gameId=Instance()
             deleteTables()
-            startG(bot, message,gameId)
+            startG(bot, message,gameId,langCode)
         else:
-            bot.send_message(message.chat.id,"شما باید از این دستور برای شروع بازی در گروه استفاده کنید")
+            bot.send_message(message.chat.id,"You must use this command to start playing in a group")
 
 
-    @bot.message_handler(regexp='اتمام کلام')
+    @bot.message_handler(regexp='اتمام کلام|End speech')
     def stopTalk_handler(message):
         gameId = gId(chatId=message.chat.id)
         trueFalse(gameId, 'games_info', 'stop_talk', 'true')
@@ -79,17 +79,29 @@ def register_handlers(bot):
 
     @bot.callback_query_handler(func=lambda call: True)
     def handle_callback(call):
-        def messageOfAccessing(bot, call):
-            bot.answer_callback_query(callback_query_id=call.id
+        def messageOfAccessing(bot, call,langCode):
+            if langCode == 'fa':
+                bot.answer_callback_query(callback_query_id=call.id
                                       , text='شما نمی توانید انتخاب کنید'
                                       , show_alert=True)
+            else:
+                bot.answer_callback_query(callback_query_id=call.id
+                                          , text="You can't choose."
+                                          , show_alert=True)
 
-        def messageOfSelecting(bot, call):
-            bot.answer_callback_query(callback_query_id=call.id
+        def messageOfSelecting(bot, call,langCode):
+            if langCode == 'fa':
+                bot.answer_callback_query(callback_query_id=call.id
                                       , text='بازیکن انتخاب شد!'
                                       , show_alert=True)
+            else:
+                bot.answer_callback_query(callback_query_id=call.id
+                                          , text="The player has been selected!"
+                                          , show_alert=True)
 
         gameId = gId(call=call)
+        langCode = getLangCode(gameId)
+        _ = set_language(langCode)
         if call.data == "Add":
             AddPlayer(bot, call,gameId)
         elif call.data == "FinalStart":
@@ -105,7 +117,7 @@ def register_handlers(bot):
         elif call.data == "no_Sherlock":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'باشه شرلوک جان')
+            bot.send_message(call.from_user.id,_('Ok Sherlock!'))
         elif call.data == "slaughter_godFather":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -121,7 +133,7 @@ def register_handlers(bot):
         elif call.data == "no_matador":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'باشه ماتادور زرنگ')
+            bot.send_message(call.from_user.id,_('Ok smart Matador'))
         elif call.data == "yes_Gunshot_matador":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -129,7 +141,7 @@ def register_handlers(bot):
         elif call.data == "no_Gunshot_matador":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'اوکی ماتادور از این پس بگذریم')
+            bot.send_message(call.from_user.id,_('Ok Matador! I got it!'))
         elif call.data == "yes_sual":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -137,7 +149,7 @@ def register_handlers(bot):
         elif call.data == "no_sual":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'باشه ساول گودمن جان')
+            bot.send_message(call.from_user.id,_('Ok Sual Goodman'))
         elif call.data == "yes_Gunshot_sual":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -145,7 +157,7 @@ def register_handlers(bot):
         elif call.data == "no_Gunshot_sual":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'اوکی ساول از این پس بگذریم')
+            bot.send_message(call.from_user.id,_('Ok Sual! lets pass it'))
         elif call.data == "yes_simpleMafia":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -153,7 +165,7 @@ def register_handlers(bot):
         elif call.data == "no_simpleMafia":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'باشه مافیای من')
+            bot.send_message(call.from_user.id,_('ok my mafia😎'))
         elif call.data == "yes_doctor":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -161,7 +173,7 @@ def register_handlers(bot):
         elif call.data == "no_doctor":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'باشه دکی جان')
+            bot.send_message(call.from_user.id,_('Ok Doctor!'))
         elif call.data == "yes_leon":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -169,7 +181,7 @@ def register_handlers(bot):
         elif call.data == "no_leon":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'باشه لئون حرفه ای')
+            bot.send_message(call.from_user.id,_('Ok Leon'))
         elif call.data == "yes_kein":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -177,7 +189,7 @@ def register_handlers(bot):
         elif call.data == "no_kein":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'باشه شهروند کین')
+            bot.send_message(call.from_user.id,_('Ok Kein'))
         elif call.data == "yes_constantine":
             trueFalse(gameId, 'games_info', 'pick', 'true')
             Delete_message(bot, call)
@@ -185,7 +197,7 @@ def register_handlers(bot):
         elif call.data == "no_constantine":
             trueFalse(gameId,'games_info','pick','true')
             Delete_message(bot, call)
-            bot.send_message(call.from_user.id,'باشه کنستانتین الهه تولد')
+            bot.send_message(call.from_user.id,_('Ok Constantine, Goddess of birth'))
         elif call.data == f'Yes_forInquiry':
             exist=existence(gameId,'games_info','pick',1)
             if exist:
@@ -202,7 +214,7 @@ def register_handlers(bot):
                 data= call.data.split('_')
                 if len(data) == 3:
                     operation,gameId,playerId=data
-                existPlayer = fetchRow(game, 'games_players',
+                existPlayer = fetchRow(gameId, 'games_players',
                                        'player_id', str(call.from_user.id))
 
                 if operation == 'challenge':
@@ -211,13 +223,13 @@ def register_handlers(bot):
                         #playerId = requester
                         activeChallenge(bot,call,playerId,gameId)
                     else:
-                        messageOfAccessing(bot,call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'vote':
                     if existPlayer:
                             CountingVotes(bot,call,playerId,gameId)
                     else:
-                        messageOfAccessing(bot,call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'hand':
                     if existPlayer:
@@ -231,9 +243,9 @@ def register_handlers(bot):
                         if selector[0][0] == str(call.from_user.id):
                             blueCart(bot,call,gameId)
                         else:
-                            messageOfAccessing(bot, call)
+                            messageOfAccessing(bot,call,langCode)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'red':
                     if existPlayer:
@@ -241,89 +253,89 @@ def register_handlers(bot):
                         if selector[0][0] == str(call.from_user.id):
                             redCart(bot, call, gameId)
                         else:
-                            messageOfAccessing(bot, call)
+                            messageOfAccessing(bot,call,langCode)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'sherlock':
                     if existPlayer:
                         player=fetchWithPId(gameId,'games_players',playerId)
-                        messageOfSelecting(bot,call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifySherlockSlaughter(bot,call,player,gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
                 elif operation == 'godSluaght':
                     if existPlayer:
                         player = fetchWithPId(gameId, 'games_players', playerId)
-                        messageOfSelecting(bot,call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifyGodfatherSlaughter(bot, call, player, gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'Shot':
                     if existPlayer:
                         player = fetchWithPId(gameId, 'games_players', playerId)
-                        messageOfSelecting(bot,call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifyGunShot(bot, call, player, gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'matador':
                     if existPlayer:
                         player = fetchWithPId(gameId, 'games_players', playerId)
-                        messageOfSelecting(bot,call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifyMatador(bot, call, player, gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'sual':
                     if existPlayer:
                         player = fetchWithPId(gameId, 'games_players', playerId)
-                        messageOfSelecting(bot,call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifySual(bot, call, player, gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'doctor':
                     if existPlayer:
                         player = fetchWithPId(gameId, 'games_players', playerId)
-                        messageOfSelecting(bot,call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifyDoctor(bot, call, player, gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'leon':
                     if existPlayer:
                         player = fetchWithPId(gameId, 'games_players', playerId)
-                        messageOfSelecting(bot, call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifyGunShot(bot, call, player, gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'kein':
                     if existPlayer:
                         player = fetchWithPId(gameId, 'games_players', playerId)
-                        messageOfSelecting(bot, call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifyKein(bot, call, player, gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
                 elif operation == 'constantine':
                     if existPlayer:
                         player = fetchWithPId(gameId, 'games_players', playerId)
-                        messageOfSelecting(bot, call)
+                        messageOfSelecting(bot,call,langCode)
                         Delete_message(bot, call)
                         VerifyConstantine(bot, call, player, gameId)
                     else:
-                        messageOfAccessing(bot, call)
+                        messageOfAccessing(bot,call,langCode)
 
 
 

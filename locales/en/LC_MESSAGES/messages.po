@@ -1,0 +1,823 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-12 13:51+0330\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: gameLogic.py:54 gameLogic.py:108
+msgid "I'm in✋"
+msgstr "I'm in✋"
+
+#: gameLogic.py:55 gameLogic.py:109
+msgid "Final start👁️‍🗨️"
+msgstr "Final start👁️‍🗨️"
+
+#: gameLogic.py:58
+msgid ""
+"Wow! What an awesome group of friends gathering to play Mafia! 😎  \n"
+"\n"
+"To join the game, first, you need to start the bot and then click on the \"I "
+"am in\" button so we can play this exciting scenario!  \n"
+"\n"
+"Scenario: The Godfather 3\n"
+"Number of Citizens** (Doctor, Leon, Kane, Constantine, Regular): 7 \n"
+"Number of Mafia** (Godfather, Matador, Saul Goodman): 3\n"
+"Independent Role** (Sherlock): 1\n"
+"\n"
+"If you don’t know the game or are unfamiliar with it, use the command `/"
+"helpG` for an explanation.\n"
+"\n"
+"\n"
+"    "
+msgstr ""
+"Wow! What an awesome group of friends gathering to play Mafia! 😎  \n"
+"\n"
+"To join the game, first, you need to start the bot and then click on the \"I "
+"am in\" button so we can play this exciting scenario!  \n"
+"\n"
+"Scenario: The Godfather 3\n"
+"Number of Citizens** (Doctor, Leon, Kane, Constantine, Regular): 7 \n"
+"Number of Mafia** (Godfather, Matador, Saul Goodman): 3\n"
+"Independent Role** (Sherlock): 1\n"
+"\n"
+"If you don’t know the game or are unfamiliar with it, use the command `/"
+"helpG` for an explanation.\n"
+"\n"
+"\n"
+"    "
+
+#: gameLogic.py:91
+msgid ""
+"Wow! What an awesome group of friends gathering to play Mafia! 😎  \n"
+"\n"
+"To join the game, first, you need to start the bot and then click on the \"I "
+"am in\" button so we can play this exciting scenario!  \n"
+"\n"
+"Scenario: The Godfather 3\n"
+"Number of Citizens** (Doctor, Leon, Kane, Constantine, Regular): 7 \n"
+"Number of Mafia** (Godfather, Matador, Saul Goodman): 3\n"
+"Independent Role** (Sherlock): 1\n"
+"\n"
+"If you don’t know the game or are unfamiliar with it, use the command `/"
+"helpG` for an explanation.\n"
+"\n"
+"Player List:\n"
+"                \n"
+"        {}"
+msgstr ""
+"Wow! What an awesome group of friends gathering to play Mafia! 😎  \n"
+"\n"
+"To join the game, first, you need to start the bot and then click on the \"I "
+"am in\" button so we can play this exciting scenario!  \n"
+"\n"
+"Scenario: The Godfather 3\n"
+"Number of Citizens** (Doctor, Leon, Kane, Constantine, Regular): 7 \n"
+"Number of Mafia** (Godfather, Matador, Saul Goodman): 3\n"
+"Independent Role** (Sherlock): 1\n"
+"\n"
+"If you don’t know the game or are unfamiliar with it, use the command `/"
+"helpG` for an explanation.\n"
+"\n"
+"Player List:\n"
+"                \n"
+"        {}"
+
+#: gameLogic.py:117
+msgid "Dear friend, you'r in the game! Please wait for it to start"
+msgstr "Dear friend, you'r in the game! Please wait for it to start"
+
+#: gameLogic.py:121
+msgid "Dear friend, you haven't start the bot"
+msgstr "Dear friend, you haven't start the bot"
+
+#: gameLogic.py:125
+msgid "You can't join to game!"
+msgstr "You can't join to game!"
+
+#: gameLogic.py:139
+msgid "GAME is started!"
+msgstr "GAME is started!"
+
+#: gameLogic.py:145
+msgid "The required number of players has not been reached!"
+msgstr "The required number of players has not been reached!"
+
+#: gameLogic.py:149
+msgid "You don't have premission to start the game!"
+msgstr "You don't have premission to start the game!"
+
+#: gameLogic.py:163 gameLogic.py:726 gameLogic.py:739 gameLogic.py:1045
+#: gameLogic.py:1123 gameLogic.py:1135 gameLogic.py:1159 gameLogic.py:1191
+msgid "Godfather"
+msgstr "Godfather"
+
+#: gameLogic.py:164 gameLogic.py:727 gameLogic.py:740 gameLogic.py:1045
+#: gameLogic.py:1159 gameLogic.py:1191
+msgid "Matador"
+msgstr "Matador"
+
+#: gameLogic.py:165 gameLogic.py:728 gameLogic.py:741 gameLogic.py:1046
+#: gameLogic.py:1191 gameLogic.py:1159
+msgid "Sual Goodman"
+msgstr "Sual Goodman"
+
+#: gameLogic.py:166 gameLogic.py:235 gameLogic.py:465 gameLogic.py:593
+#: gameLogic.py:725 gameLogic.py:960 gameLogic.py:1027 gameLogic.py:1243
+#: gameLogic.py:1289
+msgid "Mafia"
+msgstr "Mafia"
+
+#: gameLogic.py:168 gameLogic.py:169 gameLogic.py:239 gameLogic.py:704
+#: gameLogic.py:997 gameLogic.py:1019 gameLogic.py:1106 gameLogic.py:1108
+#: gameLogic.py:1124 gameLogic.py:1127 gameLogic.py:1131
+msgid "Sherlock"
+msgstr "Sherlock"
+
+#: gameLogic.py:171 gameLogic.py:237 gameLogic.py:1123 gameLogic.py:1145
+msgid "Citizen"
+msgstr "Citizen"
+
+#: gameLogic.py:186
+msgid "Your role dear friend is:"
+msgstr "Your role dear friend is:"
+
+#: gameLogic.py:187
+msgid ""
+"Welcome to the game, everyone😎\n"
+"    I'm delighted to have an enjoyable game with you all🪶\n"
+"    Your roles have been sent to you privately by me. Now, we will begin the "
+"Blind Day in 5 seconds.If you have finished speaking, let me know by typing "
+"the word End speech"
+msgstr ""
+"Welcome to the game, everyone😎\n"
+"    I'm delighted to have an enjoyable game with you all🪶\n"
+"    Your roles have been sent to you privately by me. Now, we will begin the "
+"Blind Day in 5 seconds.If you have finished speaking, let me know by typing "
+"the word End speech"
+
+#: gameLogic.py:191
+msgid "Night has begun... The city falls asleep...🌙"
+msgstr "Night has begun... The city falls asleep...🌙"
+
+#: gameLogic.py:222 gameLogic.py:272 gameLogic.py:711 gameLogic.py:855
+#: gameLogic.py:874 gameLogic.py:896 gameLogic.py:924
+msgid "Yes"
+msgstr "Yes"
+
+#: gameLogic.py:224
+msgid "🔴Do you want to make an inquiry?"
+msgstr "🔴Do you want to make an inquiry?"
+
+#: gameLogic.py:250
+msgid "From your game,"
+msgstr "From your game,"
+
+#: gameLogic.py:250
+msgid "Citizen and"
+msgstr "Citizen and"
+
+#: gameLogic.py:250
+msgid "Mafia ,went out!"
+msgstr "Mafia ,went out!"
+
+#: gameLogic.py:252
+msgid "And also, Word just came in that Sherlock has left the game!"
+msgstr "And also, Word just came in that Sherlock has left the game!"
+
+#: gameLogic.py:254
+msgid "Alright, so no inquiry will be made!"
+msgstr "Alright, so no inquiry will be made!"
+
+#: gameLogic.py:260
+msgid "Well, The inquiries are all finished now..."
+msgstr "Well, The inquiries are all finished now..."
+
+#: gameLogic.py:269
+msgid "Your vote has been registered"
+msgstr "Your vote has been registered"
+
+#: gameLogic.py:279
+msgid ""
+"🔴Do you want to make an inquiry?\n"
+"\n"
+"            List of requesters:"
+msgstr ""
+"🔴Do you want to make an inquiry?\n"
+"\n"
+"            List of requesters:"
+
+#: gameLogic.py:287
+msgid "Your vote has already been registered"
+msgstr "Your vote has already been registered"
+
+#: gameLogic.py:293 gameLogic.py:341
+msgid "You cannot make a request"
+msgstr "You cannot make a request"
+
+#: gameLogic.py:300 gameLogic.py:315
+msgid "I want✋"
+msgstr "I want✋"
+
+#: gameLogic.py:302 gameLogic.py:330
+msgid "🟠 Who wants a challenge from"
+msgstr "🟠 Who wants a challenge from"
+
+#: gameLogic.py:302 gameLogic.py:330
+msgid "?"
+msgstr "?"
+
+#: gameLogic.py:332
+msgid "List of people who are requesting a challenge from you:"
+msgstr "List of people who are requesting a challenge from you:"
+
+#: gameLogic.py:337
+msgid "You have already made a request"
+msgstr "You have already made a request"
+
+#: gameLogic.py:349
+msgid "The challenge has been selected!"
+msgstr "The challenge has been selected!"
+
+#: gameLogic.py:355
+msgid "It seems like we don't have any challenges after all"
+msgstr "It seems like we don't have any challenges after all"
+
+#: gameLogic.py:360
+msgid "it is turn to challenge which given to"
+msgstr "it is turn to challenge which given to"
+
+#: gameLogic.py:365
+msgid "Dear friend, your challenge time is over!"
+msgstr "Dear friend, your challenge time is over!"
+
+#: gameLogic.py:382
+msgid "Dear friend"
+msgstr "Dear friend"
+
+#: gameLogic.py:382
+msgid "Please speak:"
+msgstr "Please speak:"
+
+#: gameLogic.py:387
+msgid "Dear friend, your chatting time is over!"
+msgstr "Dear friend, your chatting time is over!"
+
+#: gameLogic.py:413
+msgid "Message from"
+msgstr "Message from"
+
+#: gameLogic.py:418
+msgid "🔴The Mafia chat's time is up"
+msgstr "🔴The Mafia chat's time is up"
+
+#: gameLogic.py:426
+msgid ""
+"Alright, dear friends, we have reached the 'Trust Decision' stage (Key "
+"Ace),\n"
+"     and initially,you can freely talk for three minutes"
+msgstr ""
+"Alright, dear friends, we have reached the 'Trust Decision' stage (Key "
+"Ace),\n"
+"     and initially,you can freely talk for three minutes"
+
+#: gameLogic.py:432
+msgid ""
+"Alright, the talking time is over, and now it's time for all three of you to "
+"come into my private messages (PV) and write who you trust as the citizen!"
+msgstr ""
+"Alright, the talking time is over, and now it's time for all three of you to "
+"come into my private messages (PV) and write who you trust as the citizen!"
+
+#: gameLogic.py:434
+msgid "Tell me, who do you trust as the citizen?"
+msgstr "Tell me, who do you trust as the citizen?"
+
+#: gameLogic.py:443
+msgid "Your opinion has been received!"
+msgstr "Your opinion has been received!"
+
+#: gameLogic.py:452
+msgid "According to the result,"
+msgstr "According to the result,"
+
+#: gameLogic.py:452
+msgid ""
+"have been chosen as the citizen.\n"
+"    From now on, you have 30 seconds to decide who to shake hands with!"
+msgstr ""
+"have been chosen as the citizen.\n"
+"    From now on, you have 30 seconds to decide who to shake hands with!"
+
+#: gameLogic.py:459
+msgid "Which one of your friends are you choosing to shake hands with?"
+msgstr "Which one of your friends are you choosing to shake hands with?"
+
+#: gameLogic.py:466
+msgid "With your choice, the Mafia won the game, and the town lost! 🔥🔥"
+msgstr "With your choice, the Mafia won the game, and the town lost! 🔥🔥"
+
+#: gameLogic.py:469
+msgid "With your choice, the Mafia lost the game, and the town won! 🔥🔥"
+msgstr "With your choice, the Mafia lost the game, and the town won! 🔥🔥"
+
+#: gameLogic.py:472
+msgid ""
+"Because you didn't make a choice, the Mafia won the game, and the town lost! "
+"🔥🔥"
+msgstr ""
+"Because you didn't make a choice, the Mafia won the game, and the town lost! "
+"🔥🔥"
+
+#: gameLogic.py:483 gameLogic.py:527 gameLogic.py:566
+msgid "I vote"
+msgstr "I vote"
+
+#: gameLogic.py:485 gameLogic.py:523
+msgid "🟠 We vote for"
+msgstr "🟠 We vote for"
+
+#: gameLogic.py:492
+msgid "So"
+msgstr "So"
+
+#: gameLogic.py:492
+msgid "goes to the defense"
+msgstr "goes to the defense"
+
+#: gameLogic.py:524
+msgid "List of voters:"
+msgstr "List of voters:"
+
+#: gameLogic.py:530
+msgid "Your vote was registered for him/her!"
+msgstr "Your vote was registered for him/her!"
+
+#: gameLogic.py:538
+msgid "You have already voted once!"
+msgstr "You have already voted once!"
+
+#: gameLogic.py:555
+msgid "Alright, dear"
+msgstr "Alright, dear"
+
+#: gameLogic.py:555
+msgid ""
+", it's your turn for the defense! Go ahead and start.\n"
+"                If you finish your defense early, use the phrase 'end of "
+"statement' to conclude"
+msgstr ""
+", it's your turn for the defense! Go ahead and start.\n"
+"                If you finish your defense early, use the phrase 'end of "
+"statement' to conclude"
+
+#: gameLogic.py:561
+msgid "Dear friend, your defense time is over!"
+msgstr "Dear friend, your defense time is over!"
+
+#: gameLogic.py:568
+msgid "We vote for"
+msgstr "We vote for"
+
+#: gameLogic.py:575
+msgid "Oops!, Enough Votes..."
+msgstr "Oops!, Enough Votes..."
+
+#: gameLogic.py:579
+msgid "Well, we have no defense..."
+msgstr "Well, we have no defense..."
+
+#: gameLogic.py:589
+msgid "Well, according to result,"
+msgstr "Well, according to result,"
+
+#: gameLogic.py:589
+msgid "is out of the game"
+msgstr "is out of the game"
+
+#: gameLogic.py:642
+msgid "According to the result, They will not be out of the game!"
+msgstr "According to the result, They will not be out of the game!"
+
+#: gameLogic.py:657
+msgid "Well, it's like we have to go for the lottery of death (Death draw)"
+msgstr "Well, it's like we have to go for the lottery of death (Death draw)"
+
+#: gameLogic.py:658
+msgid " must choose!"
+msgstr " must choose!"
+
+#: gameLogic.py:662
+msgid "First Card💀"
+msgstr "First Card💀"
+
+#: gameLogic.py:663
+msgid "Second Card💀"
+msgstr "Second Card💀"
+
+#: gameLogic.py:667
+msgid ""
+"The Death draw is like this, the one I choose, tells me which card he "
+"chooses between card one\n"
+"                         and two, and one of these cards is blue, and if he "
+"chooses blue, he stays in the game, but if he chooses\n"
+"                          red, the second defender stays in the game! Now, "
+"which one should you choose?"
+msgstr ""
+"The Death draw is like this, the one I choose, tells me which card he "
+"chooses between card one\n"
+"                         and two, and one of these cards is blue, and if he "
+"chooses blue, he stays in the game, but if he chooses\n"
+"                          red, the second defender stays in the game! Now, "
+"which one should you choose?"
+
+#: gameLogic.py:677
+msgid "I congratulate"
+msgstr "I congratulate"
+
+#: gameLogic.py:677
+msgid "! You are saved!"
+msgstr "! You are saved!"
+
+#: gameLogic.py:692
+msgid "Luck was not kind to you"
+msgstr "Luck was not kind to you"
+
+#: gameLogic.py:692
+msgid ",You kicked out of the game!"
+msgstr ",You kicked out of the game!"
+
+#: gameLogic.py:705
+msgid "Sherlock, wake up, come to my PV :)"
+msgstr "Sherlock, wake up, come to my PV :)"
+
+#: gameLogic.py:712 gameLogic.py:856 gameLogic.py:875 gameLogic.py:897
+#: gameLogic.py:925
+msgid "No"
+msgstr "No"
+
+#: gameLogic.py:715
+msgid "Sherlock wake up! Do you want to slaughter someone tonight?"
+msgstr "Sherlock wake up! Do you want to slaughter someone tonight?"
+
+#: gameLogic.py:722
+msgid "Sherlock, sleep, relax..."
+msgstr "Sherlock, sleep, relax..."
+
+#: gameLogic.py:729
+msgid "Simple Mafia"
+msgstr "Simple Mafia"
+
+#: gameLogic.py:732
+msgid "Mafia, wake up, I gave you a message"
+msgstr "Mafia, wake up, I gave you a message"
+
+#: gameLogic.py:738
+msgid "Names of mafia members:"
+msgstr "Names of mafia members:"
+
+#: gameLogic.py:744
+msgid ""
+"Wake up! Send any message you want forty seconds early\n"
+"        So that your friend will read it"
+msgstr ""
+"Wake up! Send any message you want forty seconds early\n"
+"        So that your friend will read it"
+
+#: gameLogic.py:756
+msgid "I slaughter"
+msgstr "I slaughter"
+
+#: gameLogic.py:757 gameLogic.py:773 gameLogic.py:800 gameLogic.py:832
+msgid "I shoot"
+msgstr "I shoot"
+
+#: gameLogic.py:760
+msgid "godfather, do you play slaughter or shoot?"
+msgstr "godfather, do you play slaughter or shoot?"
+
+#: gameLogic.py:774 gameLogic.py:801 gameLogic.py:833
+msgid "I don't shoot"
+msgstr "I don't shoot"
+
+#: gameLogic.py:777
+msgid ""
+"Matador, now that the godfather is not there, tell me, will you shoot or "
+"not??"
+msgstr ""
+"Matador, now that the godfather is not there, tell me, will you shoot or "
+"not??"
+
+#: gameLogic.py:785
+msgid "I handcuff"
+msgstr "I handcuff"
+
+#: gameLogic.py:786
+msgid "I don't handcuff"
+msgstr "I don't handcuff"
+
+#: gameLogic.py:789
+msgid "Matador, are you handcuffing anyone?"
+msgstr "Matador, are you handcuffing anyone?"
+
+#: gameLogic.py:804
+msgid ""
+"Saul, now that the godfather is not there, tell me, will you shoot or not??"
+msgstr ""
+"Saul, now that the godfather is not there, tell me, will you shoot or not??"
+
+#: gameLogic.py:815
+msgid "I negotiate"
+msgstr "I negotiate"
+
+#: gameLogic.py:816
+msgid "I don't negotiate"
+msgstr "I don't negotiate"
+
+#: gameLogic.py:819
+msgid "Saul Goodman, Cunning Mafia, Do You Negotiate?"
+msgstr "Saul Goodman, Cunning Mafia, Do You Negotiate?"
+
+#: gameLogic.py:826
+msgid "Well brother, you have done your work, go to sleep!"
+msgstr "Well brother, you have done your work, go to sleep!"
+
+#: gameLogic.py:836
+msgid "simple mafia, do you shoot?"
+msgstr "simple mafia, do you shoot?"
+
+#: gameLogic.py:843
+msgid "Sleep well mafia!"
+msgstr "Sleep well mafia!"
+
+#: gameLogic.py:848
+msgid "Doctor"
+msgstr "Doctor"
+
+#: gameLogic.py:849
+msgid "Come doctor, we have a sick patient!"
+msgstr "Come doctor, we have a sick patient!"
+
+#: gameLogic.py:859
+msgid "Dr of city, do you want to save someone?"
+msgstr "Dr of city, do you want to save someone?"
+
+#: gameLogic.py:867 gameLogic.py:1097 gameLogic.py:1105 gameLogic.py:1259
+msgid "Leon"
+msgstr "Leon"
+
+#: gameLogic.py:868
+msgid "Professional Leon, wake up, let's see what you are doing!"
+msgstr "Professional Leon, wake up, let's see what you are doing!"
+
+#: gameLogic.py:878
+msgid "Leon, do you want to shoot someone?"
+msgstr "Leon, do you want to shoot someone?"
+
+#: gameLogic.py:886 gameLogic.py:1277
+msgid "Kein"
+msgstr "Kein"
+
+#: gameLogic.py:887
+msgid "Citizen Kein, wake up and tell me you are asking?!"
+msgstr "Citizen Kein, wake up and tell me you are asking?!"
+
+#: gameLogic.py:900
+msgid "Citizen Kein, do you want to question someone?"
+msgstr "Citizen Kein, do you want to question someone?"
+
+#: gameLogic.py:909
+msgid "Well, you've done your own thing and we have to say goodbye! Bye bye!"
+msgstr "Well, you've done your own thing and we have to say goodbye! Bye bye!"
+
+#: gameLogic.py:914 gameLogic.py:1306
+msgid "Constantine"
+msgstr "Constantine"
+
+#: gameLogic.py:915
+msgid "Constantine, do you want to bring someone?"
+msgstr "Constantine, do you want to bring someone?"
+
+#: gameLogic.py:928
+msgid "Constantine, do you want to bring someone in?"
+msgstr "Constantine, do you want to bring someone in?"
+
+#: gameLogic.py:935
+msgid "Well, Constantine, you have done your job, take it easy"
+msgstr "Well, Constantine, you have done your job, take it easy"
+
+#: gameLogic.py:952
+msgid "It's day! Wake up city friends☀️"
+msgstr "It's day! Wake up city friends☀️"
+
+#: gameLogic.py:955
+msgid "We had a death last night..."
+msgstr "We had a death last night..."
+
+#: gameLogic.py:958
+msgid "killed last night:"
+msgstr "killed last night:"
+
+#: gameLogic.py:966
+msgid "And we had a slaughter, friends"
+msgstr "And we had a slaughter, friends"
+
+#: gameLogic.py:968
+msgid "We had a slaughter last night"
+msgstr "We had a slaughter last night"
+
+#: gameLogic.py:971
+msgid "Slaughter last night:"
+msgstr "Slaughter last night:"
+
+#: gameLogic.py:975
+msgid ""
+"It's time to announce that the mafia WON the game and the city lost🔥🔥🔥"
+msgstr ""
+"It's time to announce that the mafia WON the game and the city lost🔥🔥🔥"
+
+#: gameLogic.py:978
+msgid "The city means you... WON🔥🔥🔥"
+msgstr "The city means you... WON🔥🔥🔥"
+
+#: gameLogic.py:1000 gameLogic.py:1049
+msgid "Choose who you want to slaughter?"
+msgstr "Choose who you want to slaughter?"
+
+#: gameLogic.py:1002 gameLogic.py:1051 gameLogic.py:1087 gameLogic.py:1164
+#: gameLogic.py:1196 gameLogic.py:1232 gameLogic.py:1264 gameLogic.py:1282
+#: gameLogic.py:1311
+msgid "Unfortunately, you can't do anything with a handcuff"
+msgstr "Unfortunately, you can't do anything with a handcuff"
+
+#: gameLogic.py:1032
+msgid "Slaughter is correct and done. Your role from now on:"
+msgstr "Slaughter is correct and done. Your role from now on:"
+
+#: gameLogic.py:1034
+msgid "You said wrong, Sherlock!"
+msgstr "You said wrong, Sherlock!"
+
+#: gameLogic.py:1059
+msgid "What role do you think {} has?"
+msgstr "What role do you think {} has?"
+
+#: gameLogic.py:1062
+msgid "The godfather is slaughtering"
+msgstr "The godfather is slaughtering"
+
+#: gameLogic.py:1069
+msgid "Slaughter is correct and done!"
+msgstr "Slaughter is correct and done!"
+
+#: gameLogic.py:1071
+msgid "You said wrong, Senior Godfather!"
+msgstr "You said wrong, Senior Godfather!"
+
+#: gameLogic.py:1085
+msgid "Choose who you want to kill?"
+msgstr "Choose who you want to kill?"
+
+#: gameLogic.py:1104
+msgid "{} Shoot to {} "
+msgstr "{} Shoot to {} "
+
+#: gameLogic.py:1107 gameLogic.py:1110 gameLogic.py:1113 gameLogic.py:1118
+#: gameLogic.py:1121
+msgid "Done"
+msgstr "Done"
+
+#: gameLogic.py:1126 gameLogic.py:1130 gameLogic.py:1134 gameLogic.py:1140
+#: gameLogic.py:1144 gameLogic.py:1149
+msgid "Your shot is done!"
+msgstr "Your shot is done!"
+
+#: gameLogic.py:1162
+msgid "Choose who you want to handcuff?"
+msgstr "Choose who you want to handcuff?"
+
+#: gameLogic.py:1176
+msgid "{} handcuffed to {} "
+msgstr "{} handcuffed to {} "
+
+#: gameLogic.py:1180
+msgid "Ok, I understand, Matador"
+msgstr "Ok, I understand, Matador"
+
+#: gameLogic.py:1194
+msgid "Choose who you want to buy?"
+msgstr "Choose who you want to buy?"
+
+#: gameLogic.py:1203
+msgid "Simple Citizen"
+msgstr "Simple Citizen"
+
+#: gameLogic.py:1205
+msgid ""
+"Your role is out of the game and now you are a simple mafia! Saul Goodman "
+"bought you"
+msgstr ""
+"Your role is out of the game and now you are a simple mafia! Saul Goodman "
+"bought you"
+
+#: gameLogic.py:1207
+msgid "The purchase was made! Now,"
+msgstr "The purchase was made! Now,"
+
+#: gameLogic.py:1207
+msgid "became a member of the mafia team"
+msgstr "became a member of the mafia team"
+
+#: gameLogic.py:1210
+msgid "Unfortunately, the purchase did not sit!"
+msgstr "Unfortunately, the purchase did not sit!"
+
+#: gameLogic.py:1230
+msgid "Choose who you want to save?"
+msgstr "Choose who you want to save?"
+
+#: gameLogic.py:1245 gameLogic.py:1247
+msgid "Alright Doctor! Go to sleep"
+msgstr "Alright Doctor! Go to sleep"
+
+#: gameLogic.py:1262
+msgid "Choose who you want to shoot?"
+msgstr "Choose who you want to shoot?"
+
+#: gameLogic.py:1266
+msgid "You're out of bullets, man! You are getting old..."
+msgstr "You're out of bullets, man! You are getting old..."
+
+#: gameLogic.py:1280
+msgid "Choose who you want to meet?"
+msgstr "Choose who you want to meet?"
+
+#: gameLogic.py:1292
+msgid "Your research is done! If it is true, I will tell you the result today."
+msgstr "Your research is done! If it is true, I will tell you the result today."
+
+#: gameLogic.py:1294
+msgid ""
+"Your research is done! If it is correct, I will tell you the result today"
+msgstr ""
+"Your research is done! If it is correct, I will tell you the result today"
+
+#: gameLogic.py:1309
+msgid "Choose who you want to save from the dead?"
+msgstr "Choose who you want to save from the dead?"
+
+#: gameLogic.py:1323
+msgid "Ok i got it Constantine!"
+msgstr "Ok i got it Constantine!"
+
+#: handlers.py:120
+msgid "Ok Sherlock!"
+msgstr "Ok Sherlock!"
+
+#: handlers.py:136
+msgid "Ok smart Matador"
+msgstr "Ok smart Matador"
+
+#: handlers.py:144
+msgid "Ok Matador! I got it!"
+msgstr "Ok Matador! I got it!"
+
+#: handlers.py:152
+msgid "Ok Sual Goodman"
+msgstr "Ok Sual Goodman"
+
+#: handlers.py:160
+msgid "Ok Sual! lets pass it"
+msgstr "Ok Sual! lets pass it"
+
+#: handlers.py:168
+msgid "ok my mafia😎"
+msgstr "ok my mafia😎"
+
+#: handlers.py:176
+msgid "Ok Doctor!"
+msgstr "Ok Doctor!"
+
+#: handlers.py:184
+msgid "Ok Leon"
+msgstr "Ok Leon"
+
+#: handlers.py:192
+msgid "Ok Kein"
+msgstr "Ok Kein"
+
+#: handlers.py:200
+msgid "Ok Constantine, Goddess of birth"
+msgstr "Ok Constantine, Goddess of birth"

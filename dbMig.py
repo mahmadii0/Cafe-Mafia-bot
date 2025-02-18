@@ -1,12 +1,6 @@
-from idlelib.sidebar import LineNumbers
-
 import mysql.connector
 from contextlib import contextmanager
-
-from mysql.connector import custom_error_exception
-
-from constants import connectionDetail
-from constants import PlayerList
+from constants import connectionDetail,PlayerList
 @contextmanager
 def dbConnection():
     conn = None
@@ -52,7 +46,7 @@ def endGame(gameId):
         query = f"UPDATE games_info SET status = 0 WHERE game_id = %s"
         cursor.execute(query, (int(gameId),))
 
-def addGame(gameId,chatId):
+def addGame(gameId,chatId,langCode):
     with dbConnection() as cursor:
         cursor.execute(f'''SELECT * FROM games_info WHERE chat_id=%s AND status=1 ''',(str(chatId),))
         existGame=cursor.fetchall()
@@ -60,12 +54,12 @@ def addGame(gameId,chatId):
             cursor.execute(f'''UPDATE games_info SET status = 0
             WHERE game_id = "{existGame[0][0]}"
             ''')
-            return addGame(gameId,chatId)
+            return addGame(gameId,chatId,langCode)
         else:
             cursor.execute('''
             INSERT INTO games_info  
-            VALUES (%s, %s, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1,' ')
-            ''', (abs(int(gameId)), str(chatId),))
+            VALUES (%s, %s, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, %s,1,' ')
+            ''', (abs(int(gameId)), str(chatId),langCode))
         print("Successfully game added")
 def date(gameId,operate):
     with dbConnection() as cursor:
@@ -117,20 +111,27 @@ def leonBullet(gameId):
         query=f"UPDATE games_info SET leon_bullet = leon_bullet-1 WHERE game_id = %s"
         cursor.execute(query,(int(gameId),))
 
-def sualPurchese(gameId,playerId):
+def sualPurchese(gameId,playerId,langCode):
     with dbConnection() as cursor:
-        query=f"UPDATE `games_players` SET side = %s WHERE game_id = %s AND player_id = %s"
-        cursor.execute(query, ('مافیا',int(gameId),str(playerId)),)
-        query = f"UPDATE `games_players` SET role = %s WHERE game_id = %s AND player_id = %s"
-        cursor.execute(query, ('مافیا ساده', int(gameId), str(playerId)), )
+        if langCode == 'fa':
+            query=f"UPDATE `games_players` SET side = %s WHERE game_id = %s AND player_id = %s"
+            cursor.execute(query, ('مافیا',int(gameId),str(playerId)),)
+            query = f"UPDATE `games_players` SET role = %s WHERE game_id = %s AND player_id = %s"
+            cursor.execute(query, ('مافیا ساده', int(gameId), str(playerId)), )
+        else:
+            query=f"UPDATE `games_players` SET side = %s WHERE game_id = %s AND player_id = %s"
+            cursor.execute(query, ('Mafia',int(gameId),str(playerId)),)
+            query = f"UPDATE `games_players` SET role = %s WHERE game_id = %s AND player_id = %s"
+            cursor.execute(query, ('Simple Mafia', int(gameId), str(playerId)), )
 #INSERT FUNCs
 
 def insertPL(gameId, tableName, player):
     with dbConnection() as cursor:
+        # query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s)"
+        # for player in PlayerList:
+        #     cursor.execute(query, (player['id'], player['name'], player['user'], player['link'], int(gameId)))
         query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s)"
-        for player in PlayerList:
-            cursor.execute(query, (player['id'], player['name'], player['user'], player['link'], int(gameId)))
-
+        cursor.execute(query, (player['id'], player['name'], player['user'], player['link'], int(gameId)))
 def insertGP(gameId, tableName, player):
     with dbConnection() as cursor:
         query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
