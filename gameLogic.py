@@ -87,6 +87,10 @@ def AddPlayer(bot,call,gameId):
                 playerLink = f'<a href="tg://user?id={call.from_user.id}">{playerName}</a>'
                 player={'name':playerName,'id':playerId,'user':playerUser,'link':playerLink}
                 insertPL(gameId,'players',player)
+                chatMember = bot.get_chat_member(call.message.chat.id, call.from_user.id)
+                isAdmin=chatMember.status in ["administrator", "creator"]
+                if isAdmin:
+                    insertBinaryTable(gameId,'admins',playerId)
                 links=fetchLinks(gameId,'players')
                 text = _("""Wow! What an awesome group of friends gathering to play Mafia! 😎  
 
@@ -178,8 +182,11 @@ def blindFunc(bot, chatId,gameId,langCode):
     pRoleList = fetchall(gameId, 'games_players')
     for P in pRoleList:
         id = P[0]
-        if id != "180477776":
-            bot.restrict_chat_member(chatId, id, permissions=restrictChatMember)
+        admins=fetchall(gameId,'admins')
+        for admin in admins:
+            if admin[0] != id:
+                bot.restrict_chat_member(chatId, id, permissions=restrictChatMember)
+
 
     for P in pRoleList:
         role = P[4]
@@ -187,7 +194,7 @@ def blindFunc(bot, chatId,gameId,langCode):
     bot.send_message(chatId, _("""Welcome to the game, everyone😎
     I'm delighted to have an enjoyable game with you all🪶
     Your roles have been sent to you privately by me. Now, we will begin the Blind Day in 5 seconds.If you have finished speaking, let me know by typing the word End speech"""))
-    #Chat(bot,chatId,pRoleList,gameId,langCode)
+    Chat(bot,chatId,pRoleList,gameId,langCode)
     bot.send_message(chatId,_("Night has begun... The city falls asleep...🌙"))
     trueFalse(gameId,'games_info','challenge','true')
     Night(bot,chatId,gameId,langCode)
@@ -354,14 +361,18 @@ def ApplyChallenge(bot, chatId,player,gameId,langCode):
     if not challenge:
         bot.send_message(chatId, _("It seems like we don't have any challenges after all"))
     else:
-        if challenge[1] != "180477776":
-            bot.restrict_chat_member(chatId, challenge[1], permissions=allowChatMember)
+        admins = fetchall(gameId, 'admins')
+        for admin in admins:
+            if admin[0] != challenge[1]:
+                bot.restrict_chat_member(chatId, challenge[1], permissions=allowChatMember)
         requester=fetchWithPId(gameId,'games_players',challenge[1])
         bot.send_message(chatId, f'{_("it is turn to challenge which given to")}  {requester[1]}')
         trueFalse(gameId,'games_info','stop_talk','false')
         Wait(30,gameId)
-        if challenge[1] != "180477776":
-            bot.restrict_chat_member(chatId, challenge[1], permissions=restrictChatMember)
+        admins = fetchall(gameId, 'admins')
+        for admin in admins:
+            if admin[0] != challenge[1]:
+                bot.restrict_chat_member(chatId, challenge[1], permissions=restrictChatMember)
         bot.send_message(chatId, _(f'Dear friend, your challenge time is over!'))
         deleteRows('challenges','game_id',int(gameId))
         trueFalse(gameId, 'games_info', 'stop_talk', 'false')
@@ -375,15 +386,20 @@ def Chat(bot,chatId,pRoleList,gameId,langCode):
     time.sleep(5)
     challenge=bool(existence(gameId,'games_info','challenge',1))
     for P in pRoleList:
-        if P[0] != "180477776":
-            bot.restrict_chat_member(chatId, P[0], permissions=allowChatMember)
+        id = P[0]
+        admins = fetchall(gameId, 'admins')
+        for admin in admins:
+            if admin[0] != id:
+                bot.restrict_chat_member(chatId, P[0], permissions=allowChatMember)
         if challenge:
             Challenge(P,bot,chatId,gameId,langCode)
         bot.send_message(chatId, f'{_("Dear friend")} {P[1]}, {_("Please speak:")}')
         trueFalse(gameId,'games_info','stop_talk','false')
         Wait(50,gameId)
-        if P[0] != "180477776":
-            bot.restrict_chat_member(chatId, P[0], permissions=restrictChatMember)
+        admins = fetchall(gameId, 'admins')
+        for admin in admins:
+            if admin[0] != id:
+                bot.restrict_chat_member(chatId, id, permissions=restrictChatMember)
         bot.send_message(chatId, _(f'Dear friend, your chatting time is over!'))
         trueFalse(gameId,'games_info','stop_talk','false')
         time.sleep(2)
@@ -549,15 +565,19 @@ def Defence(bot,chatId,HalfNum,gameId,langCode):
             defenders.append(p)
         if int(len(defenders))>0:
             for P in defenders:
-                if P['id'] != "180477776":
-                    bot.restrict_chat_member(chatId, P['id'], permissions=allowChatMember)
+                admins = fetchall(gameId, 'admins')
+                for admin in admins:
+                    if admin[0] != P['id']:
+                        bot.restrict_chat_member(chatId, P['id'], permissions=allowChatMember)
                 playerName = fetchvalue(gameId, 'games_players', 'name', P['id'])
                 bot.send_message(chatId,f"""{_("Alright, dear")} {playerName}{_(""", it's your turn for the defense! Go ahead and start.
                 If you finish your defense early, use the phrase 'end of statement' to conclude""")}""")
                 trueFalse(gameId,'games_info','stop_talk','false')
                 Wait(75,gameId)
-                if P['id'] != "180477776":
-                    bot.restrict_chat_member(chatId, P['id'], permissions=restrictChatMember)
+                admins = fetchall(gameId, 'admins')
+                for admin in admins:
+                    if admin[0] != P['id']:
+                        bot.restrict_chat_member(chatId, P['id'], permissions=restrictChatMember)
                 bot.send_message(chatId, _("Dear friend, your defense time is over!"))
                 trueFalse(gameId,'games_info','stop_talk','false')
             Wait(2,gameId)
@@ -743,7 +763,7 @@ def Night(bot,chatId,gameId,langCode):
     for mafia in mafiaList:
         bot.send_message(mafia['id'],_(f"""{mafia["role"]} {_("""Wake up! Send any message you want forty seconds early
         So that your friend will read it""")}"""))
-    #mafiaChat(bot,mafiaList,langCode)
+    mafiaChat(bot,mafiaList,langCode)
 
     if blindNight == 1:
         date(gameId,"nights")
@@ -982,7 +1002,7 @@ def Day(bot,chatId,gameId,langCode):
     deleteRows('hand_cuffed','game_id',gameId)
     InquiryRequest(bot,chatId,gameId,langCode)
     pRoleList = fetchall(gameId, 'games_players')
-    #Chat(bot,chatId,pRoleList,gameId,langCode)
+    Chat(bot,chatId,pRoleList,gameId,langCode)
     Voting(bot,chatId,gameId,langCode)
     Night(bot, chatId,gameId,langCode)
 
@@ -1327,8 +1347,10 @@ def Ending(bot,chatId,gameId):
     pRoleList = fetchall(gameId, 'games_players')
     for P in pRoleList:
         id = P[0]
-        if id != "180477776":
-            bot.restrict_chat_member(chatId, id, permissions=allowChatMember)
+        admins = fetchall(gameId, 'admins')
+        for admin in admins:
+            if admin[0] != id:
+                bot.restrict_chat_member(chatId, id, permissions=allowChatMember)
 
 
 

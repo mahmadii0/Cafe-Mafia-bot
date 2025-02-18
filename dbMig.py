@@ -33,7 +33,7 @@ def dbConnection():
 
 def deleteTables():
     with dbConnection() as cursor:
-        tables=['hand_cuffed','slaughtereds','deads','defences','challenge_turns','challenges','votes','mafias','games_players','players']
+        tables=['admins','hand_cuffed','slaughtereds','deads','defences','challenge_turns','challenges','votes','mafias','games_players','players']
         for table in tables:
             try:
                 cursor.execute(f"DELETE FROM `{table}`")
