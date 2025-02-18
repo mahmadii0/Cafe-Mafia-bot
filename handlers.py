@@ -34,7 +34,50 @@ def register_handlers(bot: telebot):
             else:
                 bot.send_message(message.chat.id, 'شما مجوز بازی را دارید و نیازی به ثبت نام نیست !')
 
+    @bot.message_handler(commands=['helpG'])
+    def start(message: Message):
+        textFa='''در این سناریو، بازیکنان به سه گروه تقسیم می‌شوند: اکثریت شهروندان، تیم مافیا و یک نقش مستقل. هدف شهروندان، پاکسازی شهر از مافیاهاست، در حالی که مافیاها تلاش می‌کنند تعدادشان با شهروندان برابر شود. نقش مستقل نیز بسته به انتخاب خود، با یکی از دو تیم همکاری می‌کند تا به پیروزی برسد.
+بازی در دو فاز شب و روز انجام می‌شود. در شب معارفه، اعضای مافیا یکدیگر را می‌شناسند. در هر روز، بازیکنان فرصت دارند با گفتگو و اتهام‌زنی، مافیاها را شناسایی کرده و با رأی‌گیری از بازی خارج کنند. هر بازیکن می‌تواند در زمان صحبت خود، دیگران را متهم یا از اتهام تبرئه کند، اما اشاره مستقیم یا غیرمستقیم به نقش و توانایی‌های شبانه خود ممنوع است.
+در شب، تیم مافیا می‌تواند یکی از توانایی‌های خود را انتخاب کند: شلیک شبانه، استفاده از حس ششم پدرخوانده برای حدس نقش بازیکنان، یا تبدیل یک شهروند ساده به مافیای ساده توسط ساول گودمن. اگر پدرخوانده نقش بازیکنی را به درستی حدس بزند، آن بازیکن حتی با وجود حفاظت دکتر یا داشتن جلیقه، از بازی خارج می‌شود.
 
+نقش‌های کلیدی در این سناریو عبارتند از:
+پدرخوانده: رهبر مافیا که از یک شلیک شبانه لئون مصون است و توانایی حس ششم برای حدس نقش‌ها را دارد.
+ساول گودمن: مافیایی که می‌تواند یک شهروند ساده را به مافیای ساده تبدیل کند.
+ماتادور: هر شب توانایی یکی از بازیکنان را غیرفعال می‌کند.
+نوستراداموس: نقش مستقل که در شب معارفه، تعداد مافیاها را در بین سه بازیکن انتخابی خود می‌پرسد و بسته به اطلاعات، تصمیم می‌گیرد با کدام تیم همکاری کند.
+دکتر واتسون: هر شب می‌تواند جان یک نفر را نجات دهد و در طول بازی، یک‌بار خود را نجات می‌دهد.
+لئون حرفه‌ای: شهروندی که می‌تواند به مافیاها شلیک کند، اما در صورت اشتباه و شلیک به شهروند، خود از بازی خارج می‌شود.
+همشهری کین: شهروندی که می‌تواند هویت مافیا را افشا کند.
+کنستانتین: توانایی بازگرداندن یک بازیکن اخراجی به بازی را دارد.
+
+در پایان هر روز، بازیکن اخراجی یکی از کارت‌های «حرکت آخر» را به‌صورت تصادفی انتخاب می‌کند که می‌تواند تأثیرات مختلفی بر بازی داشته باشد، مانند «سکوت بره‌ها» که دو بازیکن را برای یک روز ساکت می‌کند، یا «افشای هویت» که نقش بازیکن اخراجی را فاش می‌کند.'''
+        textEn = '''In this scenario, players are divided into three groups: the majority are citizens, a mafia team, and an independent role. The citizens aim to eliminate the mafia, while the mafia seeks to match their numbers with the citizens. The independent role can choose to collaborate with either side to secure victory.
+
+The game consists of two phases: night and day.
+During the introduction night, the mafia members recognize each other.
+Each day, players can discuss, accuse, and vote to eliminate suspected mafia members. However, direct or indirect references to one's own role or abilities are prohibited.
+At night, the mafia team can use one of their abilities:
+
+A night kill
+The Godfather’s sixth sense, which allows them to guess a player’s role
+Saul Goodman’s ability to convert a simple citizen into a simple mafia member
+If the Godfather correctly guesses a player's role, that player is eliminated, even if they are protected by the doctor or wearing a vest.
+
+Key Roles in the Scenario:
+Godfather: The mafia leader, immune to one night shot from Leon, with the ability to guess roles.
+Saul Goodman: A mafia member who can convert a simple citizen into a simple mafia.
+Matador: Can disable a player's ability each night.
+Nostradamus: An independent role who, during the introduction night, selects three players and learns how many mafias are among them. Based on this information, they decide which team to support.
+Dr. Watson: Can save one person’s life each night and has a one-time self-heal.
+Leon the Professional: A citizen who can shoot mafia members, but if they mistakenly kill a citizen, they are eliminated.
+Citizen Kane: A citizen who can reveal a mafia’s identity.
+Constantine: Has the power to revive one eliminated player.
+
+At the end of each day, the eliminated player draws a random "Final Move" card, which can impact the game. For example:
+"Silence of the Lambs": Prevents two players from speaking for a day.
+"Identity Reveal": Exposes the role of the eliminated player'''
+        bot.send_message(message.chat.id,textFa)
+        bot.send_message(message.chat.id, textEn)
     @bot.message_handler(commands=['privacy'])
     def start(message):
         if message.chat.type == "private":
