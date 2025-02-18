@@ -69,6 +69,19 @@ def date(gameId,operate):
         elif operate== "nights":
             query=f"UPDATE games_info SET nights = nights + 1 WHERE game_id = %s"
             cursor.execute(query, (int(gameId),))
+
+def checking(playerId):
+    with dbConnection() as cursor:
+        query = f"SELECT * FROM `players` WHERE player_id = %s"
+        cursor.execute(query,(str(playerId),))
+        list=cursor.fetchall()
+        Len=len(list)
+        if Len:
+            return Len
+        else:
+            Len=0
+            return Len
+
 def lenPlayers(gameId,tableNames):
     with dbConnection() as cursor:
         query = f"SELECT COUNT(*) FROM `{tableNames}` WHERE game_id= %s"
@@ -292,6 +305,7 @@ def fetchWithPId(gameId,tableName,playerId):
             cursor.execute(query,(str(playerId),))
             item= cursor.fetchone()
             return item
+
 def fetchWithFK(gameId,tableName,FK,FTableName,condition,value):
     with dbConnection() as cursor:
         query=f"""SELECT {tableName}.{FK}

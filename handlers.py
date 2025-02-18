@@ -64,7 +64,6 @@ def register_handlers(bot: telebot):
                     else:
                         return instance()
             gameId=Instance()
-            deleteTables()
             startG(bot, message,gameId,langCode)
         else:
             bot.send_message(message.chat.id,"You must use this command to start playing in a group")

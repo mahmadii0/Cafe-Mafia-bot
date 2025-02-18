@@ -79,8 +79,8 @@ def AddPlayer(bot,call,gameId):
         exist = [user for user in BotUserIds if user['id'] == str(call.from_user.id)]
         if exist:
             exist=exist[0]
-            p=fetchWithPId(gameId,'players',call.from_user.id)
-            if not p:
+            len=checking(str(call.from_user.id))
+            if len == 0:
                 playerId=str(call.from_user.id)
                 playerUser = call.from_user.username
                 playerName = exist['name']
