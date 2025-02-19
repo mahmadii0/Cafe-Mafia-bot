@@ -262,7 +262,6 @@ At the end of each day, the eliminated player draws a random "Final Move" card, 
                 if operation == 'challenge':
                     exist=fetchRow(game,'challenges','challenger_id',str(call.from_user.id))
                     if exist:
-                        #playerId = requester
                         activeChallenge(bot,call,playerId,gameId)
                     else:
                         messageOfAccessing(bot,call,langCode)

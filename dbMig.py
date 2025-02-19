@@ -1,6 +1,6 @@
 import mysql.connector
 from contextlib import contextmanager
-from constants import connectionDetail,PlayerList
+from constants import connectionDetail
 @contextmanager
 def dbConnection():
     conn = None
@@ -136,13 +136,11 @@ def sualPurchese(gameId,playerId,langCode):
             cursor.execute(query, ('Mafia',int(gameId),str(playerId)),)
             query = f"UPDATE `games_players` SET role = %s WHERE game_id = %s AND player_id = %s"
             cursor.execute(query, ('Simple Mafia', int(gameId), str(playerId)), )
+
 #INSERT FUNCs
 
 def insertPL(gameId, tableName, player):
     with dbConnection() as cursor:
-        # query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s)"
-        # for player in PlayerList:
-        #     cursor.execute(query, (player['id'], player['name'], player['user'], player['link'], int(gameId)))
         query = f"INSERT INTO `{tableName}` VALUES (%s, %s, %s, %s, %s)"
         cursor.execute(query, (player['id'], player['name'], player['user'], player['link'], int(gameId)))
 def insertGP(gameId, tableName, player):
@@ -195,6 +193,7 @@ def insertShakingHands(gameId,playerId):
     with dbConnection() as cursor:
         query = f"UPDATE games_info SET shaking_hands = %s WHERE game_id = %s"
         cursor.execute(query,(str(playerId),int(gameId),))
+
 #FETCH FUNCs
 
 def fetchall(gameId,tableName=None,challengerId=None,Query=None):
@@ -317,15 +316,6 @@ def fetchWithFK(gameId,tableName,FK,FTableName,condition,value):
         list=createDic(players)
         return list
 
-#EXIST FUNC
-
-def existence(gameId,tableName,columnName,value):
-    with dbConnection() as cursor:
-        query= f"SELECT EXISTS (SELECT 1 FROM `{tableName}` WHERE game_id = %s AND `{columnName}` = %s)"
-        cursor.execute(query,(int(gameId),value))
-        result = cursor.fetchone()[0]
-        return result
-
 def fetchLinks(gameId,tableName,playerIds=None):
     with dbConnection() as cursor:
         if playerIds:
@@ -342,8 +332,17 @@ def fetchLinks(gameId,tableName,playerIds=None):
             links= cursor.fetchall()
             return links
 
-# #Delete and Drop
-#
+#EXIST FUNC
+
+def existence(gameId,tableName,columnName,value):
+    with dbConnection() as cursor:
+        query= f"SELECT EXISTS (SELECT 1 FROM `{tableName}` WHERE game_id = %s AND `{columnName}` = %s)"
+        cursor.execute(query,(int(gameId),value))
+        result = cursor.fetchone()[0]
+        return result
+
+#Delete and Drop
+
 def deleteRows(tableName,columnName1,value1,columnName2=None,value2=None):
     with dbConnection() as cursor:
         if columnName2 and value2:
