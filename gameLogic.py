@@ -457,7 +457,7 @@ def TrustDecision(bot,chatId,gameId,langCode):
                         player['votes'] = int(player['votes']) + 1
                         voters.append(str(message.chat.id))
                         bot.send_message(message.chat.id, _("Your opinion has been received!"))
-    Wait(15,gameId)
+    Wait(20,gameId)
     for player in players:
         if player['votes'] > 1:
             trustedCitizen.append(player)
@@ -586,7 +586,7 @@ def Defence(bot,chatId,HalfNum,gameId,langCode):
                 voteBtn= InlineKeyboardButton(_("I vote"),callback_data=f'vote_{gameId}_{P["id"]}')
                 markup.add(voteBtn)
                 message=bot.send_message(chatId,f' {_("We vote for")} {playerName} ',reply_markup=markup)
-                Wait(50,gameId)
+                Wait(12,gameId)
                 bot.delete_message(chatId, message.message_id)
                 votes=fetchvalue(gameId,'games_players','votes',P['id'])
                 if int(votes)>=HalfNum:
